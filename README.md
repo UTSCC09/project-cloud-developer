@@ -26,7 +26,6 @@ If at the end of the week you have spent an acceptable amount of time doing each
 
 * User authentication, username and password sign up and sign in.
   * Add user details: name, avatar, and bio.
-
 * Adding friends (two way adding and accept friends).
 * Starting/stopping work or school timer.
 * Seeing your friends statistics: current status and slacker-tracker score.
