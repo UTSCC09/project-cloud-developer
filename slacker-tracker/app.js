@@ -6,20 +6,24 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-require('dotenv').config();
+require("dotenv").config();
 
-const mongodb_url = process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
+const mongodb_url =
+  process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
 const port = process.env.PORT || 3001;
 
 mongoose.connect(mongodb_url);
 
 app.use(function (req, res, next) {
-    console.log("HTTP request", req.method, req.url, req.body);
-    next();
+  console.log("HTTP request", req.method, req.url, req.body);
+  next();
 });
 
 const users = require("./routes/users");
 app.use("/api/user", users);
+
+const friendLists = require("./routes/friendLists");
+app.use("/api/friendList", friendLists);
 
 const http = require("http");
 
