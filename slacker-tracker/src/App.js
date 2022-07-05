@@ -1,5 +1,5 @@
-import LoginButton from './components/google_auth2/login'
-import LogoutButton from './components/google_auth2/logout'
+import LoginButton from './components/google_oauth2/login'
+import LogoutButton from './components/google_oauth2/logout'
 
 function App() {
   return (
