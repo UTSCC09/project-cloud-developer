@@ -70,7 +70,7 @@ router.post("/signup", (req, res, next) => {
 
     UserModel.findOne({ email: req.body.email }, "-password", (err, user) => {
         if(err) return res.status(500).json({message: err});
-        if(user) return res.status(404).json({message: "email already exist"});
+        if(user) return res.status(409).json({message: "email already exist"});
         bcrypt.genSalt(10, function (err, salt) {
             if(err) return res.status(500).json({message: err});
             bcrypt.hash(password, salt, function (err, hash) {
@@ -78,6 +78,7 @@ router.post("/signup", (req, res, next) => {
                 let newUser = { email: email, username: username, password: hash, authorization_type: "standard" };
                 UserModel.updateOne({}, newUser, { upsert: true }, (err, data) => {
                     if(err) return res.status(500).json({message: err});
+                    req.session.user = newUser;
                     return res.status(200).json({message: "success", data: data});
                 });
             });
@@ -98,6 +99,7 @@ router.post("/signin", function (req, res, next) {
         bcrypt.compare(password, user.password, function (err, valid) {
             if (err) return res.status(500).json({ message: err });
             if (!valid) return res.status(401).json({ message: "incorrect username or password" });
+            req.session.user = user;
             let signinUser = {username: user.username, email: user.email, authorization_type: user.authorization_type};
             return res.status(200).json({message: "success", user: signinUser});
         });
@@ -107,20 +109,30 @@ router.post("/signin", function (req, res, next) {
 router.post("/oauth2/google", (req, res, next) => {
     if (!("username" in req.body)) return res.status(400).json({ message: "username is missing" });
     if (!("email" in req.body)) return res.status(400).json({ message: "email is missing" });
+    if (!("googleId" in req.body)) return res.status(400).json({ message: "googleId is missing" });
 
     let username = req.body.username;
     let email = req.body.email;
+    let googleId = req.body.googleId;
 
-    if (username.length > 20 || username.length < 3) 
-        return res.status(400).json({ message: "the length of the username must be between 3 and 20" });
-
-    let newUser = { email: email, username: username, authorization_type: "google" };
-    UserModel.updateOne({email: email}, newUser, { upsert: true }, (err, data) => {
+    let newUser = { email: email, username: username, authorization_type: "google", googleId: googleId };
+    UserModel.findOne({ email: email, googleId: googleId }, (err, user) => {
         if(err) return res.status(500).json({message: err});
-        return res.status(200).json({message: "success", data: data});
-    });
+        if(user) {
+            req.session.user = user;
+            return res.status(200).json({message: "success", user: newUser});
+        }
+        UserModel.updateOne({ googleId: googleId }, newUser, { upsert: true }, (err, data) => {
+            if(err) return res.status(500).json({message: err});
+            req.session.user = newUser;
+            return res.status(200).json({message: "first time google user", user: newUser});
+        });
+    })
 });
 
-
+router.get("/signout", function (req, res, next) {
+    req.session.destroy();
+    return res.status(200).json({ message: "success" });
+});
 
 module.exports = router;

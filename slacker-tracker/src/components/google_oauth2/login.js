@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import axios from 'axios';
 import { GoogleLogin} from 'react-google-login';
 import { useEffect } from 'react';
 import { gapi } from 'gapi-script';
@@ -20,6 +21,19 @@ export default function Login() {
 
     const onSuccess = res => {
         console.log("LOGIN SUCCESS! Current user: ", res.profileObj);
+        axios({
+            method: "POST",
+            url: "http://localhost:3001/api/user/oauth2/google",
+            data: {
+                googleId: res.profileObj.googleId,
+                username: res.profileObj.name,
+                email: res.profileObj.email
+            }
+        }).then(res => {
+            console.log(res);
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     const onFailure = res => {

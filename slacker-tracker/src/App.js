@@ -1,5 +1,5 @@
-import LoginButton from './components/Sign/login'
-import LogoutButton from './components/Sign/logout'
+import LoginButton from './components/google_auth2/login'
+import LogoutButton from './components/google_auth2/logout'
 
 function App() {
   return (
