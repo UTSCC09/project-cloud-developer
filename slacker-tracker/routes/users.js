@@ -109,24 +109,29 @@ router.post("/signup", (req, res, next) => {
           password: hash,
           authorization_type: "standard",
         };
-        UserModel.updateOne({}, newUser, { upsert: true }, (err, data) => {
-          if (err) return res.status(500).json({ message: err });
-          let newUserFriendList = {
-            email: email,
-            friendList: [],
-            sendedRequests: [],
-            receivedRequests: [],
-          };
-          FriendListModel.updateOne(
-            {},
-            newUser,
-            { upsert: true },
-            (err, data) => {
-              if (err) return res.status(500).json({ message: err });
-            }
-          );
-          return res.status(200).json({ message: "success", data: data });
-        });
+        UserModel.updateOne(
+          { email: email },
+          newUser,
+          { upsert: true },
+          (err, data) => {
+            if (err) return res.status(500).json({ message: err });
+            let newUserFriendList = {
+              email: email,
+              friendList: [],
+              sendedRequests: [],
+              receivedRequests: [],
+            };
+            FriendListModel.updateOne(
+              { email: email },
+              newUserFriendList,
+              { upsert: true },
+              (err, data) => {
+                if (err) return res.status(500).json({ message: err });
+              }
+            );
+            return res.status(200).json({ message: "success", data: data });
+          }
+        );
       });
     });
   });
