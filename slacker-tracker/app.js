@@ -18,12 +18,12 @@ app.use(
   })
 );
 
-
 const cookie = require("cookie");
 
 require('dotenv').config();
 
-const mongodb_url = process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
+const mongodb_url =
+  process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
 const port = process.env.PORT || 3001;
 
 mongoose.connect(mongodb_url);
@@ -36,6 +36,12 @@ app.use(function (req, res, next) {
 
 const users = require("./routes/users");
 app.use("/api/user", users);
+
+const friendLists = require("./routes/friendLists");
+app.use("/api/friendList", friendLists);
+
+const timers = require("./routes/timers");
+app.use("/api/timer", timers);
 
 const http = require("http");
 
