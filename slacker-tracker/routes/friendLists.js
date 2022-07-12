@@ -217,7 +217,7 @@ router.get(
           .json({ message: `user ${req.body.email} does not exist` });
       return res
         .status(200)
-        .json({ message: "success", friendList: user.friendList });
+        .json({ message: "success", data: user.friendList });
     });
   }
 );
