@@ -25,6 +25,9 @@ app.use("/api/user", users);
 const friendLists = require("./routes/friendLists");
 app.use("/api/friendList", friendLists);
 
+const timers = require("./routes/timers");
+app.use("/api/timer", timers);
+
 const http = require("http");
 
 http.createServer(app).listen(port, function (err) {

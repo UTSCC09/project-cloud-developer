@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
-const { UserModel, FriendListModel } = require("../db");
+const { UserModel, FriendListModel, TimerModel } = require("../db");
 
 router.get("/", (req, res, next) => {
   if (!("email" in req.query))
@@ -115,6 +115,8 @@ router.post("/signup", (req, res, next) => {
           { upsert: true },
           (err, data) => {
             if (err) return res.status(500).json({ message: err });
+
+            // Create FriendListModel
             let newUserFriendList = {
               email: email,
               friendList: [],
@@ -124,6 +126,22 @@ router.post("/signup", (req, res, next) => {
             FriendListModel.updateOne(
               { email: email },
               newUserFriendList,
+              { upsert: true },
+              (err, data) => {
+                if (err) return res.status(500).json({ message: err });
+              }
+            );
+
+            //Create TimerModel
+            let newUserTimer = {
+              email: email,
+              unallocatedTime: 1000 * 60 * 60 * 24,
+              allocatedTime: [],
+              duty: { name: "", startTime: Date.now() },
+            };
+            TimerModel.updateOne(
+              { email: email },
+              newUserTimer,
               { upsert: true },
               (err, data) => {
                 if (err) return res.status(500).json({ message: err });

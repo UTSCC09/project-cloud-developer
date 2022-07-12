@@ -16,7 +16,18 @@ const FriendListSchema = new Schema({
   receivedRequests: [String],
 });
 
+const TimerSchema = new Schema({
+  email: String, //primary
+  unallocatedTime: Number,
+  allocatedTime: [
+    { dutyName: String /*Unique*/, orgLength: Number, timer: Number },
+  ],
+  duty: { name: String, startTime: Date },
+});
+
 const FriendListModel = mongoose.model("FriendLists", FriendListSchema);
+const TimerModel = mongoose.model("Timers", TimerSchema);
 
 exports.UserModel = UserModel;
 exports.FriendListModel = FriendListModel;
+exports.TimerModel = TimerModel;
