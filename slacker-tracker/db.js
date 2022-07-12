@@ -2,12 +2,24 @@ const mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
-const UserModel = mongoose.model("Users", {
-  username: String,
-  email: String,
-  password: String,
-  authorization_type: String,
-});
+const userSchema = mongoose.Schema(
+    {
+        username: String,
+        email: String,
+        password: {
+            type: String,
+            required: () => {
+                return this.googleId? false : true
+            }
+        },
+        googleId: {
+            type: String,
+            required: false
+        },
+        authorization_type: String,
+    },
+    { timestamps: true }
+)
 
 const FriendListSchema = new Schema({
   email: String,
@@ -25,6 +37,7 @@ const TimerSchema = new Schema({
   duty: { name: String, startTime: Date },
 });
 
+const UserModel = mongoose.model("Users", userSchema);
 const FriendListModel = mongoose.model("FriendLists", FriendListSchema);
 const TimerModel = mongoose.model("Timers", TimerSchema);
 

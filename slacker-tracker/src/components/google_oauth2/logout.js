@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import { GoogleLogout } from 'react-google-login';
 
 export default function logout() {
@@ -7,6 +8,14 @@ export default function logout() {
 
   const onSuccess = () => {
     console.log("LOGOUT SUCCESS!");
+    axios({
+      method: "GET",
+      url: "http://localhost:3001/api/user/signout",
+    }).then(res => {
+        console.log(res);
+    }).catch(err => {
+        console.log(err);
+    })
   }
 
   return (

@@ -187,33 +187,32 @@ router.post("/signin", function (req, res, next) {
 });
 
 router.post("/oauth2/google", (req, res, next) => {
-  if (!("username" in req.body))
-    return res.status(400).json({ message: "username is missing" });
-  if (!("email" in req.body))
-    return res.status(400).json({ message: "email is missing" });
+    if (!("username" in req.body)) return res.status(400).json({ message: "username is missing" });
+    if (!("email" in req.body)) return res.status(400).json({ message: "email is missing" });
+    if (!("googleId" in req.body)) return res.status(400).json({ message: "googleId is missing" });
 
-  let username = req.body.username;
-  let email = req.body.email;
+    let username = req.body.username;
+    let email = req.body.email;
+    let googleId = req.body.googleId;
 
-  if (username.length > 20 || username.length < 3)
-    return res
-      .status(400)
-      .json({ message: "the length of the username must be between 3 and 20" });
+    let newUser = { email: email, username: username, authorization_type: "google", googleId: googleId };
+    UserModel.findOne({ email: email, googleId: googleId }, (err, user) => {
+        if(err) return res.status(500).json({message: err});
+        if(user) {
+            req.session.user = user;
+            return res.status(200).json({message: "success", user: newUser});
+        }
+        UserModel.updateOne({ googleId: googleId }, newUser, { upsert: true }, (err, data) => {
+            if(err) return res.status(500).json({message: err});
+            req.session.user = newUser;
+            return res.status(200).json({message: "first time google user", user: newUser});
+        });
+    })
+});
 
-  let newUser = {
-    email: email,
-    username: username,
-    authorization_type: "google",
-  };
-  UserModel.updateOne(
-    { email: email },
-    newUser,
-    { upsert: true },
-    (err, data) => {
-      if (err) return res.status(500).json({ message: err });
-      return res.status(200).json({ message: "success", data: data });
-    }
-  );
+router.get("/signout", function (req, res, next) {
+    req.session.destroy();
+    return res.status(200).json({ message: "success" });
 });
 
 module.exports = router;
