@@ -1,6 +1,6 @@
 import React from 'react'
 import Nav from './components/ui/nav'
-// import Add from './components/ui/add'
+import Add from './components/ui/add'
 
 function App () {
   return (
@@ -15,7 +15,7 @@ function App () {
       <Nav></Nav>
 
       {/* Add friend */}
-      {/* <Add></Add> */}
+      <Add></Add>
     </div>
   )
 }
