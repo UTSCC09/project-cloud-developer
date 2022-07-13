@@ -1,20 +1,20 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
-const UserModel = mongoose.model("Users", {
+const UserModel = mongoose.model('Users', {
   username: String,
   email: String,
   password: String,
-  authorization_type: String,
-});
+  authorization_type: String
+})
 
 const FriendListSchema = new Schema({
   email: String,
   friendList: [String],
   sendedRequests: [String],
-  receivedRequests: [String],
-});
+  receivedRequests: [String]
+})
 
-const FriendListModel = mongoose.model("FriendLists", FriendListSchema);
+const FriendListModel = mongoose.model('FriendLists', FriendListSchema)
 
-exports.UserModel = UserModel;
-exports.FriendListModel = FriendListModel;
+exports.UserModel = UserModel
+exports.FriendListModel = FriendListModel
