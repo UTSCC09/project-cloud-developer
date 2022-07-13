@@ -1,6 +1,7 @@
 import React from 'react'
 import Nav from './components/ui/nav'
-import Add from './components/ui/add'
+import Timer from './components/timer'
+import Bubble from './components/ui/bubble'
 
 function App () {
   return (
@@ -8,14 +9,14 @@ function App () {
 
       {/* Friend bubbles board */}
       <div className="board">
-
+        <Bubble></Bubble>
       </div>
+
+      {/* Add friend */}
+      <Timer></Timer>
 
       {/* Nav bar */}
       <Nav></Nav>
-
-      {/* Add friend */}
-      <Add></Add>
     </div>
   )
 }
