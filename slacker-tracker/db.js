@@ -16,7 +16,15 @@ const userSchema = mongoose.Schema(
             type: String,
             required: false
         },
-        authorization_type: String,
+        access_token: {
+          type: String,
+          required: false
+        },
+        authentication_type: String,
+        avatar: {
+          type: String,
+          required: false
+        },
     },
     { timestamps: true }
 )

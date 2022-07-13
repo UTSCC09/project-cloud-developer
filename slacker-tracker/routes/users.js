@@ -19,13 +19,14 @@ router.post("/username", (req, res, next) => {
     return res.status(400).json({ message: "email is missing" });
   if (!("username" in req.body))
     return res.status(400).json({ message: "username is missing" });
+  if (req.session.user.email != req.body.email)
+    return res.status(401).json({ message: "access denied" })
   UserModel.findOne({ email: req.body.email }, "-password", (err, user) => {
     if (err) return res.status(500).json({ message: err });
     if (!user) return res.status(404).json({ message: "user does not exist" });
     UserModel.updateOne(
       { email: req.body.email },
       { username: req.body.username },
-      { upsert: true },
       (err, data) => {
         if (err) return res.status(500).json({ message: err });
         return res.status(200).json({ message: "success", data: data });
@@ -47,6 +48,9 @@ router.post("/password", (req, res, next) => {
       message: "the length of the new password must be greater than 5",
     });
 
+  if (req.session.user.email != req.body.email)
+    return res.status(401).json({ message: "access denied" })
+
   UserModel.findOne({ email: req.body.email }, (err, user) => {
     if (err) return res.status(500).json({ message: err });
     if (!user) return res.status(404).json({ message: "user does not exist" });
@@ -55,7 +59,7 @@ router.post("/password", (req, res, next) => {
       if (!valid)
         return res
           .status(401)
-          .json({ message: "incorrect username or password" });
+          .json({ message: "incorrect password" });
       bcrypt.genSalt(10, function (err, salt) {
         if (err) return res.status(500).json({ message: err });
         bcrypt.hash(req.body.new_password, salt, function (err, hash) {
@@ -63,7 +67,6 @@ router.post("/password", (req, res, next) => {
           UserModel.updateOne(
             { email: req.body.email },
             { password: hash },
-            { upsert: true },
             (err, data) => {
               if (err) return res.status(500).json({ message: err });
               return res.status(200).json({ message: "success", data: data });
@@ -107,7 +110,7 @@ router.post("/signup", (req, res, next) => {
           email: email,
           username: username,
           password: hash,
-          authorization_type: "standard",
+          authentication_type: "standard",
         };
         UserModel.updateOne(
           { email: email },
@@ -164,7 +167,7 @@ router.post("/signin", function (req, res, next) {
   let email = req.body.email;
   let password = req.body.password;
 
-  UserModel.findOne({ email: email }, (err, user) => {
+  UserModel.findOne({ email: email }, "-password", (err, user) => {
     if (err) return res.status(500).json({ message: err });
     if (!user)
       return res
@@ -176,12 +179,8 @@ router.post("/signin", function (req, res, next) {
         return res
           .status(401)
           .json({ message: "incorrect username or password" });
-      let signinUser = {
-        username: user.username,
-        email: user.email,
-        authorization_type: user.authorization_type,
-      };
-      return res.status(200).json({ message: "success", user: signinUser });
+      req.session.user = user;
+      return res.status(200).json({ message: "success", user: user });
     });
   });
 });
@@ -195,19 +194,70 @@ router.post("/oauth2/google", (req, res, next) => {
     let email = req.body.email;
     let googleId = req.body.googleId;
 
-    let newUser = { email: email, username: username, authorization_type: "google", googleId: googleId };
-    UserModel.findOne({ email: email, googleId: googleId }, (err, user) => {
+    let newUser = { 
+      email: email, 
+      username: username, 
+      authentication_type: "google", 
+      googleId: googleId,
+      avatar: req.body.avatar,
+      access_token: req.body.access_token
+    };
+    UserModel.findOne({ email: email, authentication_type: "standard" }, (err, user) => {
+      if(err) return res.status(500).json({message: err});
+      if(user) {
+          UserModel.updateOne({ email: email }, { googleId: googleId, access_token: req.body.access_token, authentication_type: "google" }, (err, data) => {
+            if(err) return res.status(500).json({message: err});
+          });
+          req.session.user = user;
+          return res.status(200).json({message: "email already used in standard signup", user: user});
+      }
+      UserModel.findOne({ email: email, googleId: googleId }, (err, user) => {
         if(err) return res.status(500).json({message: err});
         if(user) {
+            UserModel.updateOne({ googleId: googleId }, { access_token: req.body.access_token, avatar: req.body.avatar }, (err, data) => {
+              if(err) return res.status(500).json({message: err});
+            });
             req.session.user = user;
             return res.status(200).json({message: "success", user: newUser});
         }
         UserModel.updateOne({ googleId: googleId }, newUser, { upsert: true }, (err, data) => {
             if(err) return res.status(500).json({message: err});
+            // Create FriendListModel
+            let newUserFriendList = {
+              email: email,
+              friendList: [],
+              sendedRequests: [],
+              receivedRequests: [],
+            };
+            FriendListModel.updateOne(
+              { email: email },
+              newUserFriendList,
+              { upsert: true },
+              (err, data) => {
+                if (err) return res.status(500).json({ message: err });
+              }
+            );
+
+            //Create TimerModel
+            let newUserTimer = {
+              email: email,
+              unallocatedTime: 1000 * 60 * 60 * 24,
+              allocatedTime: [],
+              duty: { name: "", startTime: Date.now() },
+            };
+            TimerModel.updateOne(
+              { email: email },
+              newUserTimer,
+              { upsert: true },
+              (err, data) => {
+                if (err) return res.status(500).json({ message: err });
+              }
+            );
             req.session.user = newUser;
             return res.status(200).json({message: "first time google user", user: newUser});
         });
     })
+    });
 });
 
 router.get("/signout", function (req, res, next) {

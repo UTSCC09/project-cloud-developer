@@ -28,7 +28,11 @@ const port = process.env.PORT || 3001;
 
 mongoose.connect(mongodb_url);
 
+const { isAuthenticated } = require("./auth");
+//app.use(isAuthenticated);
+
 app.use(function (req, res, next) {
+    req.session.user = req.session.user ? req.session.user : { email: null }
     console.log("session", req.session.user);
     console.log("HTTP request", req.method, req.url, req.body);
     next();
