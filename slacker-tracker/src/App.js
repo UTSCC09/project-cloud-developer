@@ -1,14 +1,23 @@
-import LoginButton from './components/Sign/login'
-import LogoutButton from './components/Sign/logout'
+import React from 'react'
+import Nav from './components/ui/nav'
+// import Add from './components/ui/add'
 
-function App() {
+function App () {
   return (
     <div className="App">
-      {/* for test, feel free to delete */}
-      <LoginButton/>
-      <LogoutButton/>
+
+      {/* Friend bubbles board */}
+      <div className="board">
+
+      </div>
+
+      {/* Nav bar */}
+      <Nav></Nav>
+
+      {/* Add friend */}
+      {/* <Add></Add> */}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
