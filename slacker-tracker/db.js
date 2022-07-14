@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
 var Schema = mongoose.Schema;
 
@@ -25,8 +25,8 @@ const FriendListSchema = new Schema({
   email: String,
   friendList: [String],
   sendedRequests: [String],
-  receivedRequests: [String],
-});
+  receivedRequests: [String]
+})
 
 const TimerSchema = new Schema({
   email: String, //primary
