@@ -167,7 +167,7 @@ router.post("/signin", function (req, res, next) {
   let email = req.body.email;
   let password = req.body.password;
 
-  UserModel.findOne({ email: email }, "-password", (err, user) => {
+  UserModel.findOne({ email: email }, (err, user) => {
     if (err) return res.status(500).json({ message: err });
     if (!user)
       return res

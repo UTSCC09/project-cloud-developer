@@ -1,0 +1,20 @@
+#signin-box {
+    background-color: white;
+    text-align: center;
+    padding: 40px;
+    width: 30vw;
+    margin: 20vh auto;
+}
+
+#signin-button {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.signin-text {
+    color: black;
+}
+
+.signin-title {
+    font-weight: bold;
+}

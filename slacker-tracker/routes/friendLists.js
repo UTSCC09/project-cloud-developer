@@ -203,20 +203,17 @@ const handleRequest = function (operation, senderEmail, receiverEmail, res) {
 
 router.get(
   "/",
-  [check("email").isEmail().trim().escape()],
   (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-    FriendListModel.findOne({ email: req.body.email }, (err, user) => {
+    if (!'email' in req.query) return res.status(400).json('missing email in request parameter');
+
+    FriendListModel.findOne({ email: req.query.email }, (err, user) => {
       if (err) return res.status(500).json({ message: err });
       if (!user)
         return res
           .status(404)
-          .json({ message: `user ${req.body.email} does not exist` });
-      if (req.session.user.email != req.body.email)
-        return res.status(401).json({ message: "access denied" });
+          .json({ message: `user ${req.query.email} does not exist` });
+      // if (req.session.user.email != req.body.email)
+      //   return res.status(401).json({ message: "access denied" });
       return res
         .status(200)
         .json({ message: "success", data: user.friendList });
@@ -235,8 +232,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    if (req.session.user.email != req.body.senderEmail)
-        return res.status(401).json({ message: "access denied" });
+    // if (req.session.user.email != req.body.senderEmail)
+    //     return res.status(401).json({ message: "access denied" });
     handleRequest("send", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
@@ -252,8 +249,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    if (req.session.user.email != req.body.receiverEmail)
-        return res.status(401).json({ message: "access denied" });
+    // if (req.session.user.email != req.body.receiverEmail)
+    //     return res.status(401).json({ message: "access denied" });
     handleRequest("accept", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
@@ -269,26 +266,41 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    if (req.session.user.email != req.body.senderEmail && req.session.user.email != req.body.receiverEmail)
-        return res.status(401).json({ message: "access denied" });
+    // if (req.session.user.email != req.body.senderEmail && req.session.user.email != req.body.receiverEmail)
+    //     return res.status(401).json({ message: "access denied" });
     handleRequest("cancel", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
 
-router.post(
+router.delete(
   "/deleteFriend",
   [
-    body("email1").isEmail().trim().escape(),
-    body("email2").isEmail().trim().escape(),
+    body("email1").trim().escape(),
+    body("email2").trim().escape(),
   ],
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    if (req.session.user.email != req.body.email1 && req.session.user.email != req.body.email2)
-        return res.status(401).json({ message: "access denied" });
+    // if (req.session.user.email != req.body.email1 && req.session.user.email != req.body.email2)
+    //     return res.status(401).json({ message: "access denied" });
     handleRequest("delete", req.body.email1, req.body.email2, res);
+  }
+);
+
+router.get(
+  "/getRequest",
+  (req, res) => {
+    if (!'email' in req.query) return res.status(400).json('missing email in request parameter');
+    FriendListModel.findOne({ email: req.query.email }, "receivedRequests", (err, requests) => {
+      if (err) return res.status(500).json({ message: err });
+      if (!requests)
+        return res
+          .status(404)
+          .json({ message: `user ${req.query.email} does not exist` });
+      res.status(200).json({ message: 'success', requests: requests });
+    })
   }
 );
 

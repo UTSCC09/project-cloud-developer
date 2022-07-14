@@ -70,6 +70,11 @@ code {
     monospace;
 }
 
+a {
+  color: rgb(27, 139, 213);
+  text-decoration: none;
+}
+
 .nav {
   text-align: left;
   /* top: 0;
