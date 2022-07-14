@@ -215,6 +215,8 @@ router.get(
         return res
           .status(404)
           .json({ message: `user ${req.body.email} does not exist` });
+      if (req.session.user.email != req.body.email)
+        return res.status(401).json({ message: "access denied" });
       return res
         .status(200)
         .json({ message: "success", data: user.friendList });
@@ -233,6 +235,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
+    if (req.session.user.email != req.body.senderEmail)
+        return res.status(401).json({ message: "access denied" });
     handleRequest("send", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
@@ -248,6 +252,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
+    if (req.session.user.email != req.body.receiverEmail)
+        return res.status(401).json({ message: "access denied" });
     handleRequest("accept", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
@@ -263,6 +269,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
+    if (req.session.user.email != req.body.senderEmail && req.session.user.email != req.body.receiverEmail)
+        return res.status(401).json({ message: "access denied" });
     handleRequest("cancel", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
@@ -278,6 +286,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
+    if (req.session.user.email != req.body.email1 && req.session.user.email != req.body.email2)
+        return res.status(401).json({ message: "access denied" });
     handleRequest("delete", req.body.email1, req.body.email2, res);
   }
 );
