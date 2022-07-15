@@ -292,7 +292,7 @@ router.delete(
 router.get(
   "/getRequest",
   (req, res) => {
-    if (!'email' in req.query) return res.status(400).json('missing email in request parameter');
+    if (!'email' in req.query) return res.status(400).json('missing email in request query');
     FriendListModel.findOne({ email: req.query.email }, "receivedRequests", (err, requests) => {
       if (err) return res.status(500).json({ message: err });
       if (!requests)

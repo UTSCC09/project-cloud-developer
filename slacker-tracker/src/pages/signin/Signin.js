@@ -31,7 +31,7 @@ function Signin () {
     }).then((res) => {
       console.log(res)
       document.cookie = `email=${res.data.user.email}`
-      // window.location.href = './'
+      window.location.href = './home'
     }).catch((err) => {
       console.log(err)
       setServerAlert(err.response.data.message)

@@ -1,6 +1,6 @@
 import React from 'react'
 import Nav from '../../components/ui/nav'
-import Timer from '../../components/timer'
+import TimerStart from './timerStart/TimerStart'
 import Bubble from '../../components/ui/bubble'
 
 function Home () {
@@ -13,7 +13,8 @@ function Home () {
       </div>
 
       {/* Add friend */}
-      <Timer></Timer>
+      {/* <Timer></Timer> */}
+      <TimerStart />
 
       {/* Nav bar */}
       <Nav></Nav>

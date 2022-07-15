@@ -3,20 +3,17 @@ const { body, validationResult } = require("express-validator");
 const router = express.Router();
 const { FriendListModel, TimerModel } = require("../db");
 
-router.get("/self", [body("email").isEmail().trim().escape()], (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
-  }
+router.get("/self", (req, res) => {
+  if (!'email' in req.query) return res.status(400).json('missing email in request query');
   TimerModel.findOne(
-    { email: req.body.email },
+    { email: req.query.email },
     "duty email allocatedTime unallocatedTime",
     (err, user) => {
       if (err) return res.status(500).json({ message: err });
       if (!user)
         return res
           .status(404)
-          .json({ message: `user ${req.body.email} does not exist` });
+          .json({ message: `user ${req.query.email} does not exist` });
       return res.status(200).json({ message: "success", data: user });
     }
   );

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { AppBar, Badge, Box, Toolbar, Tooltip, Typography, Avatar, IconButton, MenuItem, Menu } from '@mui/material'
 import PeopleIcon from '@mui/icons-material/People'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import '../../index.css'
 
 export default function ButtonAppBar () {
-  const pendingRequests = 4
+  const pendingRequests = 0
   const [avatar] = useState(null)
   const account = ['Profile', 'Logout', 'Add Friend']
   const [anchorElUser, setAnchorElUser] = useState(null)
@@ -21,13 +22,18 @@ export default function ButtonAppBar () {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar className="nav" position="fixed">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            slacker-tracker
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => { window.location.href = './home' }}>
+            Slacker Tracker
           </Typography>
-          <Box sx={{ margin: 3 }}>
-            <Tooltip title="Friends">
-              <Badge color="secondary" badgeContent={10} max={99}>
-                  <PeopleIcon onClick={() => { window.location.href = './friends' }}/>
+          <Box>
+            <Tooltip title="Timer" sx={{ marginRight: 3 }}>
+              <Badge color="secondary">
+                  <AccessTimeIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './timer' }}/>
+              </Badge>
+            </Tooltip>
+            <Tooltip title="Friends" sx={{ marginRight: 3 }}>
+              <Badge color="secondary">
+                  <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './friends' }}/>
               </Badge>
             </Tooltip>
           </Box>
