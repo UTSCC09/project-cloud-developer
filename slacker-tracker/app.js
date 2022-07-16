@@ -7,7 +7,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 const cors = require("cors");
-app.use(cors({ credentials: true, origin: "http://localhost:3002" }));
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
 const session = require("express-session");
 app.use(
