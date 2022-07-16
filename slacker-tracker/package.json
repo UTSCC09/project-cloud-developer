@@ -47,7 +47,7 @@
     "format": "npm run pretty && npm run fixform",
     "pretty": "npx prettier --write .",
     "form": " npx eslint *.js src/*",
-    "fixform": "npx eslint *.js src/* --fix"
+    "fixform": "npx eslint . --fix"
   },
   "eslintConfig": {
     "extends": [
