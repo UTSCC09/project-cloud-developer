@@ -1,7 +1,7 @@
 const express = require('express')
 const { check, body, validationResult } = require('express-validator')
 const router = express.Router()
-const { FriendListModel } = require('../db')
+const { FriendListModel, UserModel, TimerModel } = require('../db')
 
 const newFriendListData = function (
   operation,
@@ -309,6 +309,32 @@ router.get(
       }
       res.status(200).json({ message: 'success', requests })
     })
+  }
+)
+
+router.get(
+  '/getFriendsInfo',
+  (req, res) => {
+    if (!('email' in req.query)) return res.status(400).json('missing email in request query')
+    FriendListModel.findOne({ email: req.query.email }, 'friendList', (err, friends) => {
+      if (err) return res.status(500).json({ message: err })
+      if (!friends) {
+        return res
+          .status(404)
+          .json({ message: `user ${req.query.email} does not exist` })
+      }
+      UserModel.find({}, '-password', (err, users)=>{
+        if (err) return res.status(500).json({ message: err });
+        let friendsInfo = users.filter(user => friends.friendList.includes(user.email));
+        
+        TimerModel.find({}, (err, timers)=>{
+          if (err) return res.status(500).json({ message: err });
+          let timersInfo = timers.filter(userTimer => friends.friendList.includes(userTimer.email));
+        
+          return res.status(200).json({ message: 'success', data:{friendsInfo: friendsInfo, timersInfo: timersInfo} });
+        })
+      });
+    });
   }
 )
 
