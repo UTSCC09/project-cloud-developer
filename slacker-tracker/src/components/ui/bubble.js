@@ -1,7 +1,6 @@
 import React from 'react'
 import { Avatar } from '@mui/material'
 // import { Add } from '@mui/icons-material'
-// import CONST from './CONST'
 
 import '../../index.css'
 // import AddFriend from './add_friend'

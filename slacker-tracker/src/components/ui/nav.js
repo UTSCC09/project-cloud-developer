@@ -1,14 +1,26 @@
 import React, { useState } from 'react'
 import { AppBar, Badge, Box, Toolbar, Tooltip, Typography, Avatar, IconButton, MenuItem, Menu } from '@mui/material'
 import PeopleIcon from '@mui/icons-material/People'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
+// import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import axios from 'axios'
+import { useGoogleLogout } from 'react-google-login'
+import CONST from '../../CONST'
+// import LoginButton from '../../components/google_oauth2/login'
 import '../../index.css'
 
 export default function ButtonAppBar () {
   const pendingRequests = 0
   const [avatar] = useState(null)
-  const account = ['Profile', 'Logout', 'Add Friend']
   const [anchorElUser, setAnchorElUser] = useState(null)
+
+  const onLogoutSuccess = () => {
+    console.log('LOGOUT SUCCESS!')
+  }
+
+  const { signOut } = useGoogleLogout({
+    clientId: CONST.clientId,
+    onLogoutSuccess
+  })
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget)
@@ -16,6 +28,20 @@ export default function ButtonAppBar () {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null)
+  }
+
+  const logout = () => {
+    signOut()
+    axios({
+      method: 'GET',
+      url: 'http://localhost:3001/api/user/signout'
+    }).then(res => {
+      console.log(res)
+      onLogoutSuccess()
+      window.location.href = './signin'
+    }).catch(err => {
+      console.log(err)
+    })
   }
 
   return (
@@ -26,11 +52,11 @@ export default function ButtonAppBar () {
             Slacker Tracker
           </Typography>
           <Box>
-            <Tooltip title="Timer" sx={{ marginRight: 3 }}>
+            {/* <Tooltip title="Timer" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
                   <AccessTimeIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './timer' }}/>
               </Badge>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="Friends" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
                   <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './friends' }}/>
@@ -61,11 +87,12 @@ export default function ButtonAppBar () {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {account.map((action) => (
-                <MenuItem key={action} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{action}</Typography>
-                </MenuItem>
-              ))}
+              <MenuItem onClick={handleCloseUserMenu}>
+                <Typography textAlign="center">Profile</Typography>
+              </MenuItem>
+              <MenuItem onClick={logout}>
+                <Typography textAlign="center">Logout</Typography>
+              </MenuItem>
             </Menu>
           </Box>
               {/* <Menu
