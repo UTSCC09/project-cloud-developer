@@ -4,7 +4,7 @@ const router = express.Router()
 const { FriendListModel, TimerModel } = require('../db')
 
 router.get('/self', (req, res) => {
-  if (!'email' in req.query) return res.status(400).json('missing email in request query')
+  if (!('email' in req.query)) return res.status(400).json('missing email in request query')
   TimerModel.findOne(
     { email: req.query.email },
     'duty email allocatedTime unallocatedTime',
@@ -328,9 +328,10 @@ router.post(
 
       // Validate the timer. If it is less than 1 second, consider it as 0
       if (Math.abs(duty.timer) < 1000) duty.timer = 0
-      else if (duty.timer < -1000)
+      else if (duty.timer < -1000) {
       // exceed the timer. This should not happened
-      { return res.status(400).json('Timer error: already run out of time') }
+        return res.status(400).json('Timer error: already run out of time')
+      }
 
       user.allocatedTime = user.allocatedTime.filter(
         (el) => el.dutyName !== duty.dutyName

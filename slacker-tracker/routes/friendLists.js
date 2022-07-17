@@ -210,7 +210,7 @@ const handleRequest = function (operation, senderEmail, receiverEmail, res) {
 router.get(
   '/',
   (req, res, next) => {
-    if (!'email' in req.query) return res.status(400).json('missing email in request parameter')
+    if (!('email' in req.query)) return res.status(400).json('missing email in request parameter')
 
     FriendListModel.findOne({ email: req.query.email }, (err, user) => {
       if (err) return res.status(500).json({ message: err })
@@ -299,7 +299,7 @@ router.delete(
 router.get(
   '/getRequest',
   (req, res) => {
-    if (!'email' in req.query) return res.status(400).json('missing email in request query')
+    if (!('email' in req.query)) return res.status(400).json('missing email in request query')
     FriendListModel.findOne({ email: req.query.email }, 'receivedRequests', (err, requests) => {
       if (err) return res.status(500).json({ message: err })
       if (!requests) {
