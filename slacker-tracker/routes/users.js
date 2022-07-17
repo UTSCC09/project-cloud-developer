@@ -1,9 +1,12 @@
+const auth = require('../auth')
+const cookie = require('cookie')
+
 const express = require('express')
 const bcrypt = require('bcrypt')
 const router = express.Router()
 const { UserModel, FriendListModel, TimerModel } = require('../db')
 
-router.get('/', (req, res, next) => {
+router.get('/', auth.isAuthenticated, (req, res, next) => {
   if (!('email' in req.query)) { return res.status(400).json({ message: 'email is missing' }) }
 
   UserModel.findOne({ email: req.query.email }, '-password', (err, user) => {
@@ -13,10 +16,10 @@ router.get('/', (req, res, next) => {
   })
 })
 
-router.post('/username', (req, res, next) => {
+router.post('/username', auth.isAuthenticated, (req, res, next) => {
   if (!('email' in req.body)) { return res.status(400).json({ message: 'email is missing' }) }
   if (!('username' in req.body)) { return res.status(400).json({ message: 'username is missing' }) }
-  if (req.session.user.email !== req.body.email) { return res.status(401).json({ message: 'access denied' }) }
+  if (req.session.email !== req.body.email) { return res.status(401).json({ message: 'access denied' }) }
   UserModel.findOne({ email: req.body.email }, '-password', (err, user) => {
     if (err) return res.status(500).json({ message: err })
     if (!user) return res.status(404).json({ message: 'user does not exist' })
@@ -31,7 +34,7 @@ router.post('/username', (req, res, next) => {
   })
 })
 
-router.post('/password', (req, res, next) => {
+router.post('/password', auth.isAuthenticated, (req, res, next) => {
   if (!('email' in req.body)) { return res.status(400).json({ message: 'email is missing' }) }
   if (!('old_password' in req.body)) { return res.status(400).json({ message: 'old_password is missing' }) }
   if (!('new_password' in req.body)) { return res.status(400).json({ message: 'new_password is missing' }) }
@@ -42,7 +45,7 @@ router.post('/password', (req, res, next) => {
     })
   }
 
-  if (req.session.user.email !== req.body.email) { return res.status(401).json({ message: 'access denied' }) }
+  if (req.session.email !== req.body.email) { return res.status(401).json({ message: 'access denied' }) }
 
   UserModel.findOne({ email: req.body.email }, (err, user) => {
     if (err) return res.status(500).json({ message: err })
@@ -172,7 +175,14 @@ router.post('/signin', function (req, res, next) {
           .status(401)
           .json({ message: 'incorrect username or password' })
       }
+      // start a session
       req.session.user = user
+      // initialize cookie
+      res.setHeader('Set-Cookie', cookie.serialize('email', user.email, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+      }))
+      console.log(req.session.user)
       return res.status(200).json({ message: 'success', user })
     })
   })
@@ -201,16 +211,30 @@ router.post('/oauth2/google', (req, res, next) => {
       UserModel.updateOne({ email }, { googleId, access_token: req.body.access_token, authentication_type: 'google' }, (err, data) => {
         if (err) return res.status(500).json({ message: err })
       })
+      // start a session
       req.session.user = user
+      // initialize cookie
+      res.setHeader('Set-Cookie', cookie.serialize('email', user.email, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+      }))
+      console.log(req.session.user)
       return res.status(200).json({ message: 'email already used in standard signup', user })
     }
-    UserModel.findOne({ email, googleId }, (err, user) => {
+    UserModel.findOne({ email, googleId }, (err, newUser) => {
       if (err) return res.status(500).json({ message: err })
-      if (user) {
+      if (newUser) {
         UserModel.updateOne({ googleId }, { access_token: req.body.access_token, avatar: req.body.avatar }, (err, data) => {
           if (err) return res.status(500).json({ message: err })
         })
-        req.session.user = user
+        // start a session
+        req.session.user = newUser
+        // initialize cookie
+        res.setHeader('Set-Cookie', cookie.serialize('email', newUser.email, {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+        }))
+        console.log('this one', req.session)
         return res.status(200).json({ message: 'success', user: newUser })
       }
       UserModel.updateOne({ googleId }, newUser, { upsert: true }, (err, data) => {
@@ -246,7 +270,14 @@ router.post('/oauth2/google', (req, res, next) => {
             if (err) return res.status(500).json({ message: err })
           }
         )
+        // start a session
         req.session.user = newUser
+        // initialize cookie
+        res.setHeader('Set-Cookie', cookie.serialize('email', newUser.email, {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+        }))
+        console.log(req.session.user)
         return res.status(200).json({ message: 'first time google user', user: newUser })
       })
     })
@@ -254,7 +285,13 @@ router.post('/oauth2/google', (req, res, next) => {
 })
 
 router.get('/signout', function (req, res, next) {
+  console.log('before signout', req.session)
   req.session.destroy()
+  res.setHeader('Set-Cookie', cookie.serialize('email', '', {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+  }))
+  console.log('signout', req.session)
   return res.status(200).json({ message: 'success' })
 })
 

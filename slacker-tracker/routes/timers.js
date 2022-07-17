@@ -1,9 +1,11 @@
+const auth = require('../auth')
+
 const express = require('express')
 const { body, validationResult } = require('express-validator')
 const router = express.Router()
 const { FriendListModel, TimerModel } = require('../db')
 
-router.get('/self', (req, res) => {
+router.get('/self', auth.isAuthenticated, (req, res) => {
   if (!('email' in req.query)) return res.status(400).json('missing email in request query')
   TimerModel.findOne(
     { email: req.query.email },
@@ -22,6 +24,7 @@ router.get('/self', (req, res) => {
 
 router.get(
   '/friends',
+  auth.isAuthenticated,
   [body('email').isEmail().trim().escape()],
   (req, res) => {
     const errors = validationResult(req)
@@ -64,6 +67,7 @@ router.get(
 
 router.post(
   '/allocateTimer',
+  auth.isAuthenticated,
   [
     body('email').isEmail().trim().escape(),
     body('dutyName').isString().trim().escape(),
@@ -123,6 +127,7 @@ router.post(
 
 router.post(
   '/deleteTimer',
+  auth.isAuthenticated,
   [
     body('email').isEmail().trim().escape(),
     body('dutyName').isString().trim().escape()
@@ -169,6 +174,7 @@ router.post(
 
 router.post(
   '/modifyTimer',
+  auth.isAuthenticated,
   [
     body('email').isEmail().trim().escape(),
     body('dutyName').isString().trim().escape(),
@@ -227,6 +233,7 @@ router.post(
 
 router.post(
   '/startTimer',
+  auth.isAuthenticated,
   [
     body('email').isEmail().trim().escape(),
     body('dutyName').isString().trim().escape()
@@ -283,6 +290,7 @@ router.post(
 
 router.post(
   '/stopTimer',
+  auth.isAuthenticated,
   [
     body('email').isEmail().trim().escape(),
     body('dutyName').isString().trim().escape(),
@@ -361,6 +369,7 @@ router.post(
 
 router.post(
   '/resetTimer',
+  auth.isAuthenticated,
   [
     body('email').isEmail().trim().escape(),
     body('dutyName').isString().trim().escape()
@@ -411,6 +420,7 @@ router.post(
 
 router.post(
   '/resetAllTimer',
+  auth.isAuthenticated,
   [body('email').isEmail().trim().escape()],
   (req, res, next) => {
     const errors = validationResult(req)
@@ -451,7 +461,7 @@ router.post(
   }
 )
 
-router.post('/resetAllUser', (req, res, next) => {
+router.post('/resetAllUser', auth.isAuthenticated, (req, res, next) => {
   TimerModel.find({}, (err, users) => {
     if (err) return res.status(500).json({ message: err })
     users.forEach((user) => {

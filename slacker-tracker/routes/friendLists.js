@@ -1,5 +1,8 @@
+const auth = require('../auth')
+
 const express = require('express')
-const { check, body, validationResult } = require('express-validator')
+const { body, validationResult } = require('express-validator')
+// const { check, body, validationResult } = require('express-validator')
 const router = express.Router()
 const { FriendListModel, UserModel, TimerModel } = require('../db')
 
@@ -209,6 +212,7 @@ const handleRequest = function (operation, senderEmail, receiverEmail, res) {
 
 router.get(
   '/',
+  auth.isAuthenticated,
   (req, res, next) => {
     if (!('email' in req.query)) return res.status(400).json('missing email in request parameter')
 
@@ -219,7 +223,7 @@ router.get(
           .status(404)
           .json({ message: `user ${req.query.email} does not exist` })
       }
-      // if (req.session.user.email != req.body.email)
+      // if (req.session.email != req.body.email)
       //   return res.status(401).json({ message: "access denied" });
       return res
         .status(200)
@@ -230,6 +234,7 @@ router.get(
 
 router.post(
   '/sendRequest',
+  auth.isAuthenticated,
   [
     body('senderEmail').isEmail().trim().escape(),
     body('receiverEmail').isEmail().trim().escape()
@@ -239,7 +244,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() })
     }
-    // if (req.session.user.email != req.body.senderEmail)
+    // if (req.session.email != req.body.senderEmail)
     //     return res.status(401).json({ message: "access denied" });
     handleRequest('send', req.body.senderEmail, req.body.receiverEmail, res)
   }
@@ -247,6 +252,7 @@ router.post(
 
 router.post(
   '/acceptRequest',
+  auth.isAuthenticated,
   [
     body('senderEmail').isEmail().trim().escape(),
     body('receiverEmail').isEmail().trim().escape()
@@ -256,7 +262,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() })
     }
-    // if (req.session.user.email != req.body.receiverEmail)
+    // if (req.session.email != req.body.receiverEmail)
     //     return res.status(401).json({ message: "access denied" });
     handleRequest('accept', req.body.senderEmail, req.body.receiverEmail, res)
   }
@@ -264,6 +270,7 @@ router.post(
 
 router.post(
   '/cancelRequest',
+  auth.isAuthenticated,
   [
     body('senderEmail').isEmail().trim().escape(),
     body('receiverEmail').isEmail().trim().escape()
@@ -273,7 +280,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() })
     }
-    // if (req.session.user.email != req.body.senderEmail && req.session.user.email != req.body.receiverEmail)
+    // if (req.session.email != req.body.senderEmail && req.session.email != req.body.receiverEmail)
     //     return res.status(401).json({ message: "access denied" });
     handleRequest('cancel', req.body.senderEmail, req.body.receiverEmail, res)
   }
@@ -281,6 +288,7 @@ router.post(
 
 router.delete(
   '/deleteFriend',
+  auth.isAuthenticated,
   [
     body('email1').trim().escape(),
     body('email2').trim().escape()
@@ -290,7 +298,7 @@ router.delete(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() })
     }
-    // if (req.session.user.email != req.body.email1 && req.session.user.email != req.body.email2)
+    // if (req.session.email != req.body.email1 && req.session.email != req.body.email2)
     //     return res.status(401).json({ message: "access denied" });
     handleRequest('delete', req.body.email1, req.body.email2, res)
   }
@@ -298,6 +306,7 @@ router.delete(
 
 router.get(
   '/getRequest',
+  auth.isAuthenticated,
   (req, res) => {
     if (!('email' in req.query)) return res.status(400).json('missing email in request query')
     FriendListModel.findOne({ email: req.query.email }, 'receivedRequests', (err, requests) => {

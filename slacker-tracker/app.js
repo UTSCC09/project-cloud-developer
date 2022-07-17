@@ -22,18 +22,24 @@ const cookie = require('cookie')
 
 require('dotenv').config()
 
-const mongodb_url =
+const mongodbUrl =
   process.env.MONGODB_URL || 'mongodb://localhost:27017/slacker-tracker'
 const port = process.env.PORT || 3001
 
-mongoose.connect(mongodb_url)
+mongoose.connect(mongodbUrl)
 
 // const { isAuthenticated } = require("./auth");
 // app.use(isAuthenticated);
 
 app.use(function (req, res, next) {
-  req.session.user = req.session.user ? req.session.user : { email: null }
-  console.log('session', req.session.user)
+  // let username = (req.session.user)? req.session.user._id : '';
+  const email = (req.session.user) ? req.session.user.email : ''
+  res.setHeader('Set-Cookie', cookie.serialize('email', email, {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+  }))
+  // req.email = req.session.email ? req.session.email : null
+  console.log('app use: ', req.session.user)
   console.log('HTTP request', req.method, req.url, req.body)
   next()
 })
@@ -46,6 +52,8 @@ app.use('/api/friendList', friendLists)
 
 const timers = require('./routes/timers')
 app.use('/api/timer', timers)
+
+app.use(express.static('static'))
 
 const http = require('http')
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { AppBar, Badge, Box, Toolbar, Tooltip, Typography, Avatar, IconButton, MenuItem, Menu } from '@mui/material'
 import PeopleIcon from '@mui/icons-material/People'
-// import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import axios from 'axios'
 import { useGoogleLogout } from 'react-google-login'
 import CONST from '../../CONST'
@@ -52,11 +52,11 @@ export default function ButtonAppBar () {
             Slacker Tracker
           </Typography>
           <Box>
-            {/* <Tooltip title="Timer" sx={{ marginRight: 3 }}>
+            <Tooltip title="Timer" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
                   <AccessTimeIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './timer' }}/>
               </Badge>
-            </Tooltip> */}
+            </Tooltip>
             <Tooltip title="Friends" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
                   <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './friends' }}/>
