@@ -323,6 +323,7 @@ router.get(
 
 router.get(
   '/getFriendsInfo',
+  auth.isAuthenticated,
   (req, res) => {
     if (!('email' in req.query)) return res.status(400).json('missing email in request query')
     FriendListModel.findOne({ email: req.query.email }, 'friendList', (err, friends) => {
@@ -332,18 +333,18 @@ router.get(
           .status(404)
           .json({ message: `user ${req.query.email} does not exist` })
       }
-      UserModel.find({}, '-password', (err, users)=>{
-        if (err) return res.status(500).json({ message: err });
-        let friendsInfo = users.filter(user => friends.friendList.includes(user.email));
-        
-        TimerModel.find({}, (err, timers)=>{
-          if (err) return res.status(500).json({ message: err });
-          let timersInfo = timers.filter(userTimer => friends.friendList.includes(userTimer.email));
-        
-          return res.status(200).json({ message: 'success', data:{friendsInfo: friendsInfo, timersInfo: timersInfo} });
+      UserModel.find({}, '-password', (err, users) => {
+        if (err) return res.status(500).json({ message: err })
+        const friendsInfo = users.filter(user => friends.friendList.includes(user.email))
+
+        TimerModel.find({}, (err, timers) => {
+          if (err) return res.status(500).json({ message: err })
+          const timersInfo = timers.filter(userTimer => friends.friendList.includes(userTimer.email))
+
+          return res.status(200).json({ message: 'success', data: { friendsInfo, timersInfo } })
         })
-      });
-    });
+      })
+    })
   }
 )
 

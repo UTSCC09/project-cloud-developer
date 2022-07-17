@@ -39,7 +39,7 @@ app.use(function (req, res, next) {
     maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
   }))
   // req.email = req.session.email ? req.session.email : null
-  console.log('app use: ', req.session.user)
+  // console.log('app use: ', req.session.user)
   console.log('HTTP request', req.method, req.url, req.body)
   next()
 })
