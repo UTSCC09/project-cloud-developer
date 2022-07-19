@@ -1,0 +1,20 @@
+#signup-box {
+    background-color: white;
+    text-align: center;
+    padding: 40px;
+    width: 20vw;
+    margin: 20vh auto;
+}
+
+#signup-button {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.signup-text {
+    color: black;
+}
+
+.signup-title {
+    font-weight: bold;
+}
