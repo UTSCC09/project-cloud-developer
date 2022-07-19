@@ -1,5 +1,5 @@
 const auth = require('../auth')
-const cookie = require('cookie')
+// const cookie = require('cookie')
 
 const express = require('express')
 const bcrypt = require('bcrypt')
@@ -290,13 +290,13 @@ router.post('/oauth2/google', (req, res, next) => {
 })
 
 router.get('/signout', function (req, res, next) {
-  console.log('before signout', req.session)
+  // console.log('before signout', req.session)
   req.session.destroy()
   // res.setHeader('Set-Cookie', cookie.serialize('email', '', {
   //   path: '/',
   //   maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
   // }))
-  console.log('signout', req.session)
+  // console.log('signout', req.session)
   return res.status(200).json({ message: 'success' })
 })
 
