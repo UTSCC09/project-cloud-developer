@@ -1,17 +1,18 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AppBar, Badge, Box, Toolbar, Tooltip, Typography, Avatar, IconButton, MenuItem, Menu } from '@mui/material'
 import PeopleIcon from '@mui/icons-material/People'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import axios from 'axios'
 import { useGoogleLogout } from 'react-google-login'
 import CONST from '../../CONST'
+import Cookies from 'js-cookie'
 // import LoginButton from '../../components/google_oauth2/login'
 import '../../index.css'
 
 export default function ButtonAppBar () {
   const pendingRequests = 0
-  const [avatar] = useState(null)
   const [anchorElUser, setAnchorElUser] = useState(null)
+  const [me, setMe] = useState(null)
 
   const onLogoutSuccess = () => {
     console.log('LOGOUT SUCCESS!')
@@ -21,6 +22,24 @@ export default function ButtonAppBar () {
     clientId: CONST.clientId,
     onLogoutSuccess
   })
+
+  const email = Cookies.get('email')
+
+  useEffect(() => {
+    axios({
+      method: 'GET',
+      url: `http://localhost:3001/api/user?email=${email}`,
+      withCredentials: true
+    }).then((res) => {
+      console.log(res.data.user)
+      setMe(res.data.user)
+    }).catch((err) => {
+      console.log(err)
+      // go to sign in page if fail (once is enough)
+      window.location.href = './signin'
+    })
+    console.log(me)
+  }, [])
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget)
@@ -39,6 +58,7 @@ export default function ButtonAppBar () {
       console.log(res)
       onLogoutSuccess()
       window.location.href = './signin'
+      document.cookie = 'email=""'
     }).catch(err => {
       console.log(err)
     })
@@ -67,7 +87,8 @@ export default function ButtonAppBar () {
             <Tooltip title="Account">
             <Badge badgeContent={pendingRequests} color="secondary">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar src={avatar}/>
+                  { me && <Avatar src={me.avatar}/>}
+                  { !me && <Avatar src=''/>}
               </IconButton>
               </Badge>
             </Tooltip>

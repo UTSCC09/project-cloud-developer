@@ -33,13 +33,13 @@ mongoose.connect(mongodbUrl)
 
 app.use(function (req, res, next) {
   // let username = (req.session.user)? req.session.user._id : '';
-  const email = (req.session.user) ? req.session.user.email : ''
-  res.setHeader('Set-Cookie', cookie.serialize('email', email, {
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
-  }))
+  // const email = (req.session.user) ? req.session.user.email : ''
+  // res.setHeader('Set-Cookie', cookie.serialize('email', email, {
+  //   path: '/',
+  //   maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+  // }))
   // req.email = req.session.email ? req.session.email : null
-  // console.log('app use: ', req.session.user)
+  console.log('app use: ', req.session)
   console.log('HTTP request', req.method, req.url, req.body)
   next()
 })

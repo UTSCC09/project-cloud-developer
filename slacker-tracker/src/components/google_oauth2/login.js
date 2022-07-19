@@ -26,7 +26,8 @@ export default function Login () {
         email: res.profileObj.email,
         avatar: res.profileObj.imageUrl || null,
         access_token: res.tokenObj.access_token
-      }
+      },
+      withCredentials: true
     })
       .then((res) => {
         console.log(res)
