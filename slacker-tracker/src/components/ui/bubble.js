@@ -75,7 +75,7 @@ export default function Bubble () {
           </div>
           <div className="stats">
             {myTime && myTime.allocatedTime && myTime.allocatedTime.map((duty) => (
-              <div key={duty._id}>{duty.dutyName}: {duty.timer}</div>
+              <div key={duty._id}>{duty.dutyName}: {Math.round((duty.orgLength - duty.timer) / 1000 / 60)} minutes</div>
             ))}
           </div>
           <div className="score"><div>{me.score}</div></div>
@@ -94,7 +94,7 @@ export default function Bubble () {
             {/* <IconButton alt={user.score} /> */}
             <div className="stats">
               {users.timersInfo.at(index).allocatedTime.map((duty) => (
-                <div key={duty._id}>{duty.dutyName}: {duty.timer}</div>
+                <div key={duty._id}>{duty.dutyName}: {Math.round((duty.orgLength - duty.timer) / 1000 / 60)} minutes</div>
               ))}
             </div>
           </div>
