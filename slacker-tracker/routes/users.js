@@ -1,6 +1,7 @@
 const auth = require("../auth");
+const uuid = require("node-uuid");
+const Path = require("path");
 const cookie = require("cookie");
-const Nanoid = require("nanoid");
 const formidable = require("formidable");
 const fs = require("fs");
 const imageinfo = require("imageinfo");
@@ -30,7 +31,7 @@ router.get(
   }
 );
 
-app.get(
+router.get(
   "/avatar",
   auth.isAuthenticated,
   [query("_id").isString().notEmpty().trim().escape()],
@@ -47,12 +48,11 @@ app.get(
         if (!user) {
           return res.status(404).json({ message: "user does not exist" });
         }
-        fs.readFileSync(user.avatar, (err, data) => {
-          if (err) return res.status(500).json({ message: err });
-          info = imageinfo(data);
-          res.setHeader("Content-Type", info.mimeType);
-          res.sendFile(`${__dirname}/${user.avatar}`);
-        });
+        const avatarPath = Path.resolve(__dirname, "..") + "/" + user.avatar;
+        const avatarImg = fs.readFileSync(avatarPath);
+        info = imageinfo(avatarImg);
+        res.setHeader("Content-Type", info.mimeType);
+        return res.sendFile(avatarPath);
       }
     );
   }
@@ -127,6 +127,38 @@ router.post(
 );
 
 router.post(
+  "/bio",
+  auth.isAuthenticated,
+  [
+    body("_id").isString().notEmpty().trim().escape(),
+    body("bio").isString().trim().escape(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
+    if (req.session.user._id !== req.body._id)
+      return res.status(401).json({ message: "access denied" });
+
+    UserModel.findOne({ _id: req.body._id }, "-password", (err, user) => {
+      if (err) return res.status(500).json({ message: err });
+      if (!user)
+        return res.status(404).json({ message: "user does not exist" });
+      UserModel.updateOne(
+        { _id: req.body._id },
+        { bio: req.body.bio },
+        (err, data) => {
+          if (err) return res.status(500).json({ message: err });
+          return res.status(200).json({ message: "success", data });
+        }
+      );
+    });
+  }
+);
+
+router.post(
   "/password",
   auth.isAuthenticated,
   [
@@ -179,14 +211,14 @@ router.post(
 router.post(
   "/avatar",
   auth.isAuthenticated,
-  [body("_id").isString().notEmpty().trim().escape()],
+  [query("_id").isString().notEmpty().trim().escape()],
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
 
-    if (req.session.user._id !== req.body._id) {
+    if (req.session.user._id !== req.query._id) {
       return res.status(401).json({ message: "access denied" });
     }
 
@@ -203,7 +235,7 @@ router.post(
     form.parse(req, (err, fields, files) => {
       if (err) return res.status(500).json({ message: err });
       let extName = "";
-      switch (files.file.type) {
+      switch (files.file.mimetype) {
         case "image/pjpeg":
           extName = "jpg";
           break;
@@ -222,15 +254,15 @@ router.post(
           message: "only support image type of jpg or png",
         });
       } else {
-        UserModel.findOne({ _id: req.body._id }, (err, user) => {
+        UserModel.findOne({ _id: req.query._id }, (err, user) => {
           if (err) return res.status(500).json({ message: err });
           if (!user)
             return res.status(404).json({ message: "user does not exist" });
           let avatarName = "/" + Date.now() + "." + extName;
           let newPath = form.uploadDir + avatarName;
-          fs.renameSync(files.file.path, newPath);
+          fs.renameSync(files.file.filepath, newPath);
           UserModel.updateOne(
-            { _id: req.body._id },
+            { _id: req.query._id },
             { avatar: newPath },
             (err, data) => {
               if (err) return res.status(500).json({ message: err });
@@ -246,7 +278,7 @@ router.post(
 router.post(
   "/signup",
   [
-    body("name").isString().isLength({ min: 3, max: 20 }).trim().escape(),
+    body("name").isString().isLength({ min: 1, max: 20 }).trim().escape(),
     body("email").notEmpty().isEmail().trim().escape(),
     body("password").isString().isLength({ min: 6 }).trim().escape(),
   ],
@@ -267,7 +299,7 @@ router.post(
         if (err) return res.status(500).json({ message: err });
         bcrypt.hash(password, salt, function (err, hash) {
           if (err) return res.status(500).json({ message: err });
-          const _id = Nanoid.nanoid();
+          const _id = uuid.v1();
 
           const newUser = {
             _id: _id,
@@ -276,6 +308,7 @@ router.post(
             password: hash,
             authentication_type: "standard",
             slackerScore: 0,
+            bio: "",
           };
           UserModel.updateOne(
             { _id: _id },
@@ -425,7 +458,7 @@ router.post(
 router.post(
   "/oauth2/google",
   [
-    body("name").isString().isLength({ min: 3, max: 20 }).trim().escape(),
+    body("name").isString().isLength({ max: 20 }).trim().escape(),
     body("email").notEmpty().isEmail().trim().escape(),
     body("googleId").notEmpty().trim().escape(),
   ],
@@ -433,7 +466,7 @@ router.post(
     const name = req.body.name;
     const email = req.body.email;
     const googleId = req.body.googleId;
-    const _id = Nanoid.nanoid();
+    const _id = uuid.v1();
 
     const newUser = {
       _id,
@@ -444,6 +477,7 @@ router.post(
       avatar: req.body.avatar,
       access_token: req.body.access_token,
       slackerScore: 0,
+      bio: "",
     };
 
     UserModel.findOne(
@@ -513,145 +547,162 @@ router.post(
               }
             );
           });
-        }
-        UserModel.findOne({ email, googleId }, (err, existUser) => {
-          if (err) return res.status(500).json({ message: err });
-          if (existUser) {
-            UserModel.updateOne(
-              { googleId },
-              { access_token: req.body.access_token, avatar: req.body.avatar },
-              (err, data) => {
-                if (err) return res.status(500).json({ message: err });
-              }
-            );
-
-            TimerModel.findOne({ _id: existUser._id }, (err, userTimer) => {
-              if (err) return res.status(500).json({ message: err });
-              if (!userTimer)
-                return res
-                  .status(404)
-                  .json({ message: `user ${existUser._id} not found` });
-              if (userTimer.duty.name !== "offline")
-                return res
-                  .status(400)
-                  .json({ message: "You have already login" });
-              const loginTime = Date.now();
-              const newOfflineTotal =
-                userTimer.offlineTime.totalTimeSpent +
-                loginTime -
-                userTimer.duty.startTime;
-              userTimer.offlineTime.intervals.push({
-                startTime: userTimer.duty.startTime,
-                endTime: loginTime,
-              });
-              TimerModel.updateOne(
-                { _id: existUser._id },
+        } else {
+          UserModel.findOne({ email, googleId }, (err, existUser) => {
+            if (err) return res.status(500).json({ message: err });
+            if (existUser) {
+              UserModel.updateOne(
+                { googleId },
                 {
-                  offlineTime: {
-                    totalTimeSpent: newOfflineTotal,
-                    intervals: userTimer.offlineTime.intervals,
-                  },
-                  duty: { name: "unallocate", startTime: Date.now() },
+                  access_token: req.body.access_token,
+                  avatar: req.body.avatar,
                 },
+                (err, data) => {
+                  if (err) return res.status(500).json({ message: err });
+                  TimerModel.findOne(
+                    { _id: existUser._id },
+                    (err, userTimer) => {
+                      if (err) return res.status(500).json({ message: err });
+                      if (!userTimer)
+                        return res
+                          .status(404)
+                          .json({ message: `user ${existUser._id} not found` });
+                      if (userTimer.duty.name !== "offline")
+                        return res
+                          .status(400)
+                          .json({ message: "You have already login" });
+                      const loginTime = Date.now();
+                      const newOfflineTotal =
+                        userTimer.offlineTime.totalTimeSpent +
+                        loginTime -
+                        userTimer.duty.startTime;
+                      userTimer.offlineTime.intervals.push({
+                        startTime: userTimer.duty.startTime,
+                        endTime: loginTime,
+                      });
+                      TimerModel.updateOne(
+                        { _id: existUser._id },
+                        {
+                          offlineTime: {
+                            totalTimeSpent: newOfflineTotal,
+                            intervals: userTimer.offlineTime.intervals,
+                          },
+                          duty: { name: "unallocate", startTime: Date.now() },
+                        },
+                        { upsert: true },
+                        (err, data) => {
+                          if (err) {
+                            return res.status(500).json({ message: err });
+                          }
+                          // start a session
+                          req.session.user = existUser;
+                          req.session.save();
+                          // initialize cookie
+                          res.setHeader(
+                            "Set-Cookie",
+                            cookie.serialize("_id", existUser._id, {
+                              path: "/",
+                              maxAge: 60 * 60 * 24 * 7, // 1 week in number of seconds
+                            })
+                          );
+                          console.log(req.session.user);
+                          return res
+                            .status(200)
+                            .json({ message: "success", data });
+                        }
+                      );
+                    }
+                  );
+                }
+              );
+            } else {
+              UserModel.updateOne(
+                { googleId },
+                newUser,
                 { upsert: true },
                 (err, data) => {
                   if (err) return res.status(500).json({ message: err });
+                  // Create FriendListModel
+                  const newUserFriendList = {
+                    _id,
+                    friendList: [],
+                    sendedRequests: [],
+                    receivedRequests: [],
+                  };
+                  FriendListModel.updateOne(
+                    { _id },
+                    newUserFriendList,
+                    { upsert: true },
+                    (err, data) => {
+                      if (err) return res.status(500).json({ message: err });
+                    }
+                  );
+
+                  // Create TimerModel
+                  const newUserTimer = {
+                    _id: _id,
+                    workTime: {
+                      totalTimeSpent: 0,
+                      intervals: [],
+                    },
+                    studyTime: {
+                      totalTimeSpent: 0,
+                      intervals: [],
+                    },
+                    entertainmentTime: {
+                      totalTimeSpent: 0,
+                      intervals: [],
+                    },
+                    offlineTime: {
+                      totalTimeSpent: 0,
+                      intervals: [],
+                    },
+                    unallocatedTime: {
+                      totalTimeSpent: 0,
+                      intervals: [],
+                    },
+                    duty: { name: "unallocate", startTime: Date.now() },
+                  };
+                  TimerModel.updateOne(
+                    { _id },
+                    newUserTimer,
+                    { upsert: true },
+                    (err, data) => {
+                      if (err) return res.status(500).json({ message: err });
+                    }
+                  );
                   // start a session
-                  req.session.user = existUser;
+                  req.session.user = newUser;
                   req.session.save();
                   // initialize cookie
                   res.setHeader(
                     "Set-Cookie",
-                    cookie.serialize("_id", existUser._id, {
+                    cookie.serialize("_id", newUser._id, {
                       path: "/",
                       maxAge: 60 * 60 * 24 * 7, // 1 week in number of seconds
                     })
                   );
                   console.log(req.session.user);
-                  return res.status(200).json({ message: "success", data });
+                  return res
+                    .status(200)
+                    .json({ message: "first time google user", user: newUser });
                 }
               );
-            });
-          }
-          UserModel.updateOne(
-            { googleId },
-            newUser,
-            { upsert: true },
-            (err, data) => {
-              if (err) return res.status(500).json({ message: err });
-              // Create FriendListModel
-              const newUserFriendList = {
-                _id,
-                friendList: [],
-                sendedRequests: [],
-                receivedRequests: [],
-              };
-              FriendListModel.updateOne(
-                { _id },
-                newUserFriendList,
-                { upsert: true },
-                (err, data) => {
-                  if (err) return res.status(500).json({ message: err });
-                }
-              );
-
-              // Create TimerModel
-              const newUserTimer = {
-                _id: _id,
-                workTime: {
-                  totalTimeSpent: 0,
-                  intervals: [],
-                },
-                studyTime: {
-                  totalTimeSpent: 0,
-                  intervals: [],
-                },
-                entertainmentTime: {
-                  totalTimeSpent: 0,
-                  intervals: [],
-                },
-                offlineTime: {
-                  totalTimeSpent: 0,
-                  intervals: [],
-                },
-                unallocatedTime: {
-                  totalTimeSpent: 0,
-                  intervals: [],
-                },
-                duty: { name: "unallocate", startTime: Date.now() },
-              };
-              TimerModel.updateOne(
-                { _id },
-                newUserTimer,
-                { upsert: true },
-                (err, data) => {
-                  if (err) return res.status(500).json({ message: err });
-                }
-              );
-              // start a session
-              req.session.user = newUser;
-              req.session.save();
-              // initialize cookie
-              res.setHeader(
-                "Set-Cookie",
-                cookie.serialize("_id", newUser._id, {
-                  path: "/",
-                  maxAge: 60 * 60 * 24 * 7, // 1 week in number of seconds
-                })
-              );
-              console.log(req.session.user);
-              return res
-                .status(200)
-                .json({ message: "first time google user", user: newUser });
             }
-          );
-        });
+          });
+        }
       }
     );
   }
 );
 
 router.get("/signout", function (req, res, next) {
+  if (
+    req.session === null ||
+    req.session === undefined ||
+    req.session.user === undefined
+  )
+    return res.status(401).json({ message: "You are not loged in yet" });
   TimerModel.findOne({ _id: req.session.user._id }, (err, userTimer) => {
     if (err) return res.status(500).json({ message: err });
     if (!userTimer)
@@ -715,38 +766,25 @@ router.get("/signout", function (req, res, next) {
         break;
     }
     TimerModel.updateOne(
-      { _id: existUser._id },
+      { _id: req.session.user._id },
       newData,
       { upsert: true },
       (err, data) => {
         if (err) return res.status(500).json({ message: err });
-        // start a session
-        req.session.user = existUser;
-        req.session.save();
-        // initialize cookie
+
+        req.session.destroy();
         res.setHeader(
           "Set-Cookie",
-          cookie.serialize("_id", existUser._id, {
+          cookie.serialize("_id", "", {
             path: "/",
             maxAge: 60 * 60 * 24 * 7, // 1 week in number of seconds
           })
         );
-        console.log(req.session.user);
-        return res.status(200).json({ message: "success", data });
+        console.log("signout", req.session);
+        return res.status(200).json({ message: "success" });
       }
     );
   });
-  // console.log('before signout', req.session)
-  req.session.destroy();
-  res.setHeader(
-    "Set-Cookie",
-    cookie.serialize("_id", "", {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 1 week in number of seconds
-    })
-  );
-  console.log("signout", req.session);
-  return res.status(200).json({ message: "success" });
 });
 
 module.exports = router;

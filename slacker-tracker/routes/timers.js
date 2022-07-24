@@ -1,7 +1,7 @@
 const auth = require("../auth");
 
 const express = require("express");
-const { body, validationResult } = require("express-validator");
+const { query, body, validationResult } = require("express-validator");
 const router = express.Router();
 const { UserModel, FriendListModel, TimerModel } = require("../db");
 
@@ -86,16 +86,20 @@ router.get(
               const friendTimer = friendsTimer.find(
                 (el) => (el._id = friendInfo._id)
               );
-              friendInfo.workTimeSpent = friendTimer.workTime.totalTimeSpent;
-              friendInfo.studyTimeSpent = friendTimer.studyTime.totalTimeSpent;
-              friendInfo.entertainmentTimeSpent =
-                friendTimer.entertainmentTime.totalTimeSpent;
-              friendInfo.offlineTimeSpent =
-                friendTimer.offlineTime.totalTimeSpent;
-              friendInfo.unallocatedTimeSpent =
-                friendTimer.unallocatedTime.totalTimeSpent;
-              friendInfo.duty = friendTimer.duty;
-              data.push(friendInfo);
+              const singleData = {
+                _id: friendInfo._id,
+                name: friendInfo.name,
+                slackerScore: friendInfo.slackerScore,
+                workTimeSpent: friendTimer.workTime.totalTimeSpent,
+                studyTimeSpent: friendTimer.studyTime.totalTimeSpent,
+                entertainmentTimeSpent:
+                  friendTimer.entertainmentTime.totalTimeSpent,
+                offlineTimeSpent: friendTimer.offlineTime.totalTimeSpent,
+                unallocatedTimeSpent:
+                  friendTimer.unallocatedTime.totalTimeSpent,
+                duty: friendTimer.duty,
+              };
+              data.push(singleData);
             });
             return res.status(200).json({ message: "success", data });
           });
@@ -118,7 +122,7 @@ router.post(
       return res.status(422).json({ errors: errors.array() });
     }
 
-    if (!["work", "entertainment", "study"].includes(dutyName))
+    if (!["work", "entertainment", "study"].includes(req.body.dutyName))
       return res.status(400).json({ message: "wrong duty name" });
 
     TimerModel.findOne({ _id: req.body._id }, (err, user) => {
@@ -185,7 +189,7 @@ router.post(
       return res.status(422).json({ errors: errors.array() });
     }
 
-    if (!["work", "entertainment", "study"].includes(dutyName))
+    if (!["work", "entertainment", "study"].includes(req.body.dutyName))
       return res.status(400).json({ message: "wrong duty name" });
 
     TimerModel.findOne({ _id: req.body._id }, (err, user) => {
@@ -199,11 +203,10 @@ router.post(
         return res.status(400).json({
           message: `Access denined`,
         });
-      if (user.duty.name === "unallocate") {
+      if (user.duty.name !== req.body.dutyName)
         return res.status(400).json({
-          message: `Timer error. You are working on nothing`,
+          message: `You cannot stop ${req.body.dutyName} because you are on ${user.duty.name}`,
         });
-      }
 
       const dutyStopTime = Date.now();
       let newData = { duty: { name: "unallocate", startTime: dutyStopTime } };
