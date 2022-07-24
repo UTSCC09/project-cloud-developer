@@ -1,493 +1,267 @@
-const auth = require('../auth')
+const auth = require("../auth");
 
-const express = require('express')
-const { body, validationResult } = require('express-validator')
-const router = express.Router()
-const { FriendListModel, TimerModel } = require('../db')
-
-router.get('/self', auth.isAuthenticated, (req, res) => {
-  if (!('email' in req.query)) return res.status(400).json('missing email in request query')
-  TimerModel.findOne(
-    { email: req.query.email },
-    'duty email allocatedTime unallocatedTime',
-    (err, user) => {
-      if (err) return res.status(500).json({ message: err })
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: `user ${req.query.email} does not exist` })
-      }
-      return res.status(200).json({ message: 'success', data: user })
-    }
-  )
-})
+const express = require("express");
+const { query, body, validationResult } = require("express-validator");
+const router = express.Router();
+const { UserModel, FriendListModel, TimerModel } = require("../db");
 
 router.get(
-  '/friends',
+  "/self",
   auth.isAuthenticated,
-  [body('email').isEmail().trim().escape()],
+  [query("_id").isString().notEmpty().trim().escape()],
   (req, res) => {
-    const errors = validationResult(req)
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
+      return res.status(422).json({ errors: errors.array() });
+    }
+    TimerModel.findOne({ _id: req.query._id }, (err, userTimer) => {
+      if (err) return res.status(500).json({ message: err });
+      if (!userTimer) {
+        return res
+          .status(404)
+          .json({ message: `user ${req.query.email} does not exist` });
+      }
+      let data = {
+        workTimeSpent: userTimer.workTime.totalTimeSpent,
+        studyTimeSpent: userTimer.studyTime.totalTimeSpent,
+        entertainmentTimeSpent: userTimer.entertainmentTime.totalTimeSpent,
+        offlineTImeSpent: userTimer.offlineTime.totalTimeSpent,
+        unallocatedTime: userTimer.unallocatedTime.totalTimeSpent,
+        duty: userTimer.duty,
+      };
+      UserModel.findOne(
+        { _id: req.query._id },
+        "name slackerScore",
+        (err, user) => {
+          if (err) return res.status(500).json({ message: err });
+          data._id = req.query._id;
+          data.name = user.name;
+          data.slackerScore = user.slackerScore;
+          return res.status(200).json({ message: "success", data });
+        }
+      );
+    });
+  }
+);
+
+router.get(
+  "/friends",
+  auth.isAuthenticated,
+  [query("_id").isString().notEmpty().trim().escape()],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
     }
     FriendListModel.findOne(
-      { email: req.body.email },
-      'friendList',
+      { _id: req.query._id },
+      "friendList",
       (err, user) => {
-        if (err) return res.status(500).json({ message: err })
+        if (err) return res.status(500).json({ message: err });
         if (!user) {
           return res
             .status(404)
-            .json({ message: `user ${req.body.email} does not exist` })
+            .json({ message: `user ${req.query._id} does not exist` });
         }
-
-        TimerModel.find(
-          {},
-          'duty email allocatedTime unallocatedTime',
-          (err, friendsTimer) => {
-            if (err) return res.status(500).json({ message: err })
-            if (!friendsTimer) {
-              return res
-                .status(404)
-                .json({ message: 'user\'s timer does not exist' })
-            }
-            friendsTimer = friendsTimer.filter((el) =>
-              user.friendList.includes(el.email)
-            )
+        let data = [];
+        TimerModel.find({}, (err, friendsTimer) => {
+          if (err) return res.status(500).json({ message: err });
+          if (!friendsTimer) {
             return res
-              .status(200)
-              .json({ message: 'success', data: friendsTimer })
+              .status(404)
+              .json({ message: "user's timer does not exist" });
           }
-        )
+          friendsTimer = friendsTimer.filter((el) =>
+            user.friendList.includes(el._id)
+          );
+          UserModel.find({}, "_id name slackerScore", (err, friendsInfo) => {
+            if (err) return res.status(500).json({ message: err });
+            if (!friendsInfo) {
+              return res.status(404).json({ message: "users does not exist" });
+            }
+            friendsInfo = friendsInfo.filter((el) =>
+              user.friendList.includes(el._id)
+            );
+            friendsInfo.forEach((friendInfo) => {
+              const friendTimer = friendsTimer.find(
+                (el) => (el._id = friendInfo._id)
+              );
+              const singleData = {
+                _id: friendInfo._id,
+                name: friendInfo.name,
+                slackerScore: friendInfo.slackerScore,
+                workTimeSpent: friendTimer.workTime.totalTimeSpent,
+                studyTimeSpent: friendTimer.studyTime.totalTimeSpent,
+                entertainmentTimeSpent:
+                  friendTimer.entertainmentTime.totalTimeSpent,
+                offlineTimeSpent: friendTimer.offlineTime.totalTimeSpent,
+                unallocatedTimeSpent:
+                  friendTimer.unallocatedTime.totalTimeSpent,
+                duty: friendTimer.duty,
+              };
+              data.push(singleData);
+            });
+            return res.status(200).json({ message: "success", data });
+          });
+        });
       }
-    )
+    );
   }
-)
+);
 
 router.post(
-  '/allocateTimer',
+  "/startTimer",
   auth.isAuthenticated,
   [
-    body('email').isEmail().trim().escape(),
-    body('dutyName').isString().trim().escape(),
-    body('orgLength').isString().trim().escape()
+    body("_id").isString().trim().escape(),
+    body("dutyName").isString().trim().escape(),
   ],
   (req, res, next) => {
-    const errors = validationResult(req)
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
+      return res.status(422).json({ errors: errors.array() });
     }
 
-    if (req.body.dutyName === '') { return res.status(400).json({ message: 'Duty name is not defined' }) }
-    const orgLength = parseInt(req.body.orgLength)
+    if (!["work", "entertainment", "study"].includes(req.body.dutyName))
+      return res.status(400).json({ message: "wrong duty name" });
 
-    TimerModel.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return res.status(500).json({ message: err })
+    TimerModel.findOne({ _id: req.body._id }, (err, user) => {
+      if (err) return res.status(500).json({ message: err });
       if (!user) {
         return res
           .status(404)
-          .json({ message: `user ${req.body.email} does not exist` })
+          .json({ message: `user ${req.body._id} does not exist` });
       }
-
-      if (
-        user.allocatedTime.find((el) => el.dutyName === req.body.dutyName) !==
-        undefined
-      ) { return res.status(400).json({ message: 'Duty already exists' }) }
-
-      if (orgLength > user.unallocatedTime) {
-        return res
-          .status(400)
-          .json({ message: "You don't have enough unallocated time left" })
-      }
-      user.allocatedTime.push({
-        dutyName: req.body.dutyName,
-        orgLength,
-        timer: orgLength
-      })
-
-      TimerModel.updateOne(
-        { email: req.body.email },
-        {
-          allocatedTime: user.allocatedTime,
-          unallocatedTime: user.unallocatedTime - orgLength
-        },
-        { upsert: true },
-        (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-          return res.status(200).json({
-            message: 'success',
-            data
-          })
-        }
-      )
-    })
-  }
-)
-
-router.post(
-  '/deleteTimer',
-  auth.isAuthenticated,
-  [
-    body('email').isEmail().trim().escape(),
-    body('dutyName').isString().trim().escape()
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-
-    TimerModel.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return res.status(500).json({ message: err })
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: `user ${req.body.email} does not exist` })
-      }
-
-      const duty = user.allocatedTime.find(
-        (el) => el.dutyName === req.body.dutyName
-      )
-      if (duty === undefined) { return res.status(404).json({ message: 'Duty not found' }) }
-
-      TimerModel.updateOne(
-        { email: req.body.email },
-        {
-          allocatedTime: user.allocatedTime.filter(
-            (el) => el.dutyName !== req.body.dutyName
-          ),
-          unallocatedTime: user.unallocatedTime + duty.orgLength
-        },
-        { upsert: true },
-        (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-          return res.status(200).json({
-            message: 'success',
-            data
-          })
-        }
-      )
-    })
-  }
-)
-
-router.post(
-  '/modifyTimer',
-  auth.isAuthenticated,
-  [
-    body('email').isEmail().trim().escape(),
-    body('dutyName').isString().trim().escape(),
-    body('newTimeLength').isString().trim().escape()
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-
-    const newTimeLength = parseInt(req.body.newTimeLength)
-
-    TimerModel.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return res.status(500).json({ message: err })
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: `user ${req.body.email} does not exist` })
-      }
-
-      const duty = user.allocatedTime.find(
-        (el) => el.dutyName === req.body.dutyName
-      )
-      if (duty === undefined) { return res.status(404).json({ message: 'Duty not found' }) }
-      const newUnallocatedTime =
-        user.unallocatedTime + duty.orgLength - newTimeLength
-      if (newUnallocatedTime < 0) { return res.status(400).json("You don't have enough unallocated time") }
-
-      user.allocatedTime = user.allocatedTime.filter(
-        (el) => el.dutyName !== req.body.dutyName
-      )
-      duty.timer = duty.timer + newTimeLength - duty.orgLength
-      if (duty.timer < 0) duty.timer = 0
-      duty.orgLength = newTimeLength
-      user.allocatedTime.push(duty)
-
-      TimerModel.updateOne(
-        { email: req.body.email },
-        {
-          allocatedTime: user.allocatedTime,
-          unallocatedTime: newUnallocatedTime
-        },
-        { upsert: true },
-        (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-          return res.status(200).json({
-            message: 'success',
-            data
-          })
-        }
-      )
-    })
-  }
-)
-
-router.post(
-  '/startTimer',
-  auth.isAuthenticated,
-  [
-    body('email').isEmail().trim().escape(),
-    body('dutyName').isString().trim().escape()
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-
-    TimerModel.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return res.status(500).json({ message: err })
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: `user ${req.body.email} does not exist` })
-      }
-      if (user.duty.name !== '') {
+      if (user.duty.name === "offline")
         return res.status(400).json({
-          message: `You are working on ${user.duty.name} right now`
-        })
-      }
-
-      const duty = user.allocatedTime.find(
-        (el) => el.dutyName === req.body.dutyName
-      )
-      if (duty === undefined) { return res.status(404).json({ message: 'Duty not found' }) }
-      if (duty.timer <= 0) {
+          message: `Access denined`,
+        });
+      if (user.duty.name !== "unallocate") {
         return res.status(400).json({
-          message: `You have already complete ${duty.dutyName} today`
-        })
+          message: `You are working on ${user.duty.name} right now`,
+        });
       }
 
-      const startTime = Date.now()
+      const dutyStartTime = Date.now();
+      const newUnallocateTimeSpent =
+        user.unallocatedTime.totalTimeSpent -
+        user.duty.startTime +
+        dutyStartTime;
+      user.unallocatedTime.intervals.push({
+        startTime: user.duty.startTime,
+        endTime: dutyStartTime,
+      });
+
       TimerModel.updateOne(
-        { email: req.body.email },
+        { _id: req.body._id },
         {
-          duty: { name: duty.dutyName, startTime }
+          unallocatedTime: {
+            totalTimeSpent: newUnallocateTimeSpent,
+            intervals: user.unallocatedTime.intervals,
+          },
+          duty: { name: req.body.dutyName, startTime: dutyStartTime },
         },
         { upsert: true },
         (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-          data.startTime = startTime
-          data.timeLeft = duty.timer
+          if (err) return res.status(500).json({ message: err });
+          data.startTime = dutyStartTime;
+          data.name = req.body.dutyName;
           return res.status(200).json({
-            message: 'success',
-            data
-          })
+            message: "success",
+            data,
+          });
         }
-      )
-    })
+      );
+    });
   }
-)
+);
 
 router.post(
-  '/stopTimer',
+  "/stopTimer",
   auth.isAuthenticated,
   [
-    body('email').isEmail().trim().escape(),
-    body('dutyName').isString().trim().escape(),
-    body('stopDate').isString().trim().escape()
+    body("_id").isString().trim().escape(),
+    body("dutyName").isString().trim().escape(),
   ],
   (req, res, next) => {
-    const errors = validationResult(req)
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
+      return res.status(422).json({ errors: errors.array() });
     }
 
-    // Back end timer validation. The difference should be less than 1 seconds
-    const backEndDate = Date.now()
-    const stopDate = parseInt(req.body.stopDate)
-    if (Math.abs(stopDate - backEndDate) >= 1000) {
-      return res
-        .status(400)
-        .json(
-          `Stop time error! Expecting: ${backEndDate}, but received: ${stopDate}`
-        )
-    }
+    if (!["work", "entertainment", "study"].includes(req.body.dutyName))
+      return res.status(400).json({ message: "wrong duty name" });
 
-    TimerModel.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return res.status(500).json({ message: err })
+    TimerModel.findOne({ _id: req.body._id }, (err, user) => {
+      if (err) return res.status(500).json({ message: err });
       if (!user) {
         return res
           .status(404)
-          .json({ message: `user ${req.body.email} does not exist` })
+          .json({ message: `user ${req.body._id} does not exist` });
       }
-      if (user.duty.name === '') {
+      if (user.duty.name === "offline")
         return res.status(400).json({
-          message: 'You are working on nothing right now'
-        })
+          message: `Access denined`,
+        });
+      if (user.duty.name !== req.body.dutyName)
+        return res.status(400).json({
+          message: `You cannot stop ${req.body.dutyName} because you are on ${user.duty.name}`,
+        });
+
+      const dutyStopTime = Date.now();
+      let newData = { duty: { name: "unallocate", startTime: dutyStopTime } };
+      switch (req.body.dutyName) {
+        case "work":
+          newData.workTime = {};
+          newData.workTime.totalTimeSpent =
+            user.workTime.totalTimeSpent + dutyStopTime - user.duty.startTime;
+          user.workTime.intervals.push({
+            startTime: user.duty.startTime,
+            endTime: dutyStopTime,
+          });
+          newData.workTime.intervals = user.workTime.intervals;
+          break;
+        case "entertainment":
+          newData.entertainmentTime = {};
+          newData.entertainmentTime.totalTimeSpent =
+            user.entertainmentTime.totalTimeSpent +
+            dutyStopTime -
+            user.duty.startTime;
+          user.entertainmentTime.intervals.push({
+            startTime: user.duty.startTime,
+            endTime: dutyStopTime,
+          });
+          newData.entertainmentTime.intervals =
+            user.entertainmentTime.intervals;
+          break;
+        case "study":
+          newData.studyTime = {};
+          newData.studyTime.totalTimeSpent =
+            user.studyTime.totalTimeSpent + dutyStopTime - user.duty.startTime;
+          user.studyTime.intervals.push({
+            startTime: user.duty.startTime,
+            endTime: dutyStopTime,
+          });
+          newData.studyTime.intervals = user.studyTime.intervals;
+          break;
       }
-
-      const duty = user.allocatedTime.find(
-        (el) => el.dutyName === req.body.dutyName
-      )
-      if (duty === undefined) { return res.status(404).json({ message: 'Duty not found' }) }
-
-      const timePassed = backEndDate - user.duty.startTime
-      duty.timer = duty.timer - timePassed
-
-      // Validate the timer. If it is less than 1 second, consider it as 0
-      if (Math.abs(duty.timer) < 1000) duty.timer = 0
-      else if (duty.timer < -1000) {
-      // exceed the timer. This should not happened
-        return res.status(400).json('Timer error: already run out of time')
-      }
-
-      user.allocatedTime = user.allocatedTime.filter(
-        (el) => el.dutyName !== duty.dutyName
-      )
-      user.allocatedTime.push(duty)
 
       TimerModel.updateOne(
-        { email: req.body.email },
-        {
-          allocatedTime: user.allocatedTime,
-          duty: { name: '', startTime: backEndDate }
-        },
+        { _id: req.body._id },
+        newData,
         { upsert: true },
         (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-          data.stopTime = backEndDate
-          data.timeLeft = duty.timer
+          if (err) return res.status(500).json({ message: err });
+          data.endTime = dutyStopTime;
+          data.name = req.body.dutyName;
           return res.status(200).json({
-            message: 'success',
-            data
-          })
+            message: "success",
+            data,
+          });
         }
-      )
-    })
+      );
+    });
   }
-)
+);
 
-router.post(
-  '/resetTimer',
-  auth.isAuthenticated,
-  [
-    body('email').isEmail().trim().escape(),
-    body('dutyName').isString().trim().escape()
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-
-    TimerModel.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return res.status(500).json({ message: err })
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: `user ${req.body.email} does not exist` })
-      }
-
-      const duty = user.allocatedTime.find(
-        (el) => el.dutyName === req.body.dutyName
-      )
-      if (duty === undefined) { return res.status(404).json({ message: 'Duty not found' }) }
-
-      duty.timer = duty.orgLength
-
-      user.allocatedTime = user.allocatedTime.filter(
-        (el) => el.dutyName !== duty.dutyName
-      )
-      user.allocatedTime.push(duty)
-
-      TimerModel.updateOne(
-        { email: req.body.email },
-        {
-          allocatedTime: user.allocatedTime
-        },
-        { upsert: true },
-        (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-          return res.status(200).json({
-            message: 'success',
-            data
-          })
-        }
-      )
-    })
-  }
-)
-
-router.post(
-  '/resetAllTimer',
-  auth.isAuthenticated,
-  [body('email').isEmail().trim().escape()],
-  (req, res, next) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-
-    TimerModel.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return res.status(500).json({ message: err })
-      if (!user) {
-        return res
-          .status(404)
-          .json({ message: `user ${req.body.email} does not exist` })
-      }
-
-      const resetTime = []
-      user.allocatedTime.forEach((duty) => {
-        duty.timer = duty.orgLength
-        resetTime.push(duty)
-      })
-
-      TimerModel.updateOne(
-        { email: req.body.email },
-        {
-          allocatedTime: resetTime,
-          duty: { name: '', startTime: Date.now() }
-        },
-        { upsert: true },
-        (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-          return res.status(200).json({
-            message: 'success',
-            data
-          })
-        }
-      )
-    })
-  }
-)
-
-router.post('/resetAllUser', auth.isAuthenticated, (req, res, next) => {
-  TimerModel.find({}, (err, users) => {
-    if (err) return res.status(500).json({ message: err })
-    users.forEach((user) => {
-      const resetTime = []
-      user.allocatedTime.forEach((duty) => {
-        duty.timer = duty.orgLength
-        resetTime.push(duty)
-      })
-
-      TimerModel.updateOne(
-        { email: req.body.email },
-        {
-          allocatedTime: resetTime,
-          duty: { name: '', startTime: Date.now() }
-        },
-        { upsert: true },
-        (err, data) => {
-          if (err) return res.status(500).json({ message: err })
-        }
-      )
-    })
-    return res.status(200).json({
-      message: 'success',
-      data: { numUsers: users.length }
-    })
-  })
-})
-
-module.exports = router
+module.exports = router;
