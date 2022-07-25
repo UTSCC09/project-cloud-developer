@@ -344,7 +344,7 @@ router.post(
                   totalTimeSpent: 0,
                   intervals: [],
                 },
-                entertainmentTime: {
+                playTime: {
                   totalTimeSpent: 0,
                   intervals: [],
                 },
@@ -649,7 +649,7 @@ router.post(
                       totalTimeSpent: 0,
                       intervals: [],
                     },
-                    entertainmentTime: {
+                    playTime: {
                       totalTimeSpent: 0,
                       intervals: [],
                     },
@@ -728,17 +728,16 @@ router.get("/signout", function (req, res, next) {
         newData.workTime.intervals = userTimer.workTime.intervals;
         break;
       case "entertainment":
-        newData.entertainmentTime = {};
-        newData.entertainmentTime.totalTimeSpent =
-          userTimer.entertainmentTime.totalTimeSpent +
+        newData.playTime = {};
+        newData.playTime.totalTimeSpent =
+          userTimer.playTime.totalTimeSpent +
           logoutTime -
           userTimer.duty.startTime;
-        userTimer.entertainmentTime.intervals.push({
+        userTimer.playTime.intervals.push({
           startTime: userTimer.duty.startTime,
           endTime: logoutTime,
         });
-        newData.entertainmentTime.intervals =
-          userTimer.entertainmentTime.intervals;
+        newData.playTime.intervals = userTimer.playTime.intervals;
         break;
       case "study":
         newData.studyTime = {};

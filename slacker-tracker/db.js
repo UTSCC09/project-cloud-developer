@@ -55,7 +55,7 @@ const TimerSchema = new Schema({
     totalTimeSpent: Number,
     intervals: [{ startTime: Date, endTime: Date }],
   },
-  entertainmentTime: {
+  playTime: {
     totalTimeSpent: Number,
     intervals: [{ startTime: Date, endTime: Date }],
   },

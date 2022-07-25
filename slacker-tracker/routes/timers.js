@@ -24,7 +24,7 @@ router.get(
       let data = {
         workTimeSpent: userTimer.workTime.totalTimeSpent,
         studyTimeSpent: userTimer.studyTime.totalTimeSpent,
-        entertainmentTimeSpent: userTimer.entertainmentTime.totalTimeSpent,
+        playTimeSpent: userTimer.playTime.totalTimeSpent,
         offlineTImeSpent: userTimer.offlineTime.totalTimeSpent,
         unallocatedTime: userTimer.unallocatedTime.totalTimeSpent,
         duty: userTimer.duty,
@@ -92,8 +92,7 @@ router.get(
                 slackerScore: friendInfo.slackerScore,
                 workTimeSpent: friendTimer.workTime.totalTimeSpent,
                 studyTimeSpent: friendTimer.studyTime.totalTimeSpent,
-                entertainmentTimeSpent:
-                  friendTimer.entertainmentTime.totalTimeSpent,
+                playTimeSpent: friendTimer.playTime.totalTimeSpent,
                 offlineTimeSpent: friendTimer.offlineTime.totalTimeSpent,
                 unallocatedTimeSpent:
                   friendTimer.unallocatedTime.totalTimeSpent,
@@ -222,17 +221,14 @@ router.post(
           newData.workTime.intervals = user.workTime.intervals;
           break;
         case "entertainment":
-          newData.entertainmentTime = {};
-          newData.entertainmentTime.totalTimeSpent =
-            user.entertainmentTime.totalTimeSpent +
-            dutyStopTime -
-            user.duty.startTime;
-          user.entertainmentTime.intervals.push({
+          newData.playTime = {};
+          newData.playTime.totalTimeSpent =
+            user.playTime.totalTimeSpent + dutyStopTime - user.duty.startTime;
+          user.playTime.intervals.push({
             startTime: user.duty.startTime,
             endTime: dutyStopTime,
           });
-          newData.entertainmentTime.intervals =
-            user.entertainmentTime.intervals;
+          newData.playTime.intervals = user.playTime.intervals;
           break;
         case "study":
           newData.studyTime = {};
