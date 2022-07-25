@@ -67,7 +67,7 @@ const TimerSchema = new Schema({
     totalTimeSpent: Number,
     intervals: [{ startTime: Date, endTime: Date }],
   },
-  duty: { name: String, startTime: Date }, // ['work', 'study', 'entertainment', 'offline', 'unallocated'].includes(name) === true
+  duty: { name: String, startTime: Date }, // ['work', 'study', 'play', 'offline', 'unallocated'].includes(name) === true
 });
 
 const UserModel = mongoose.model("Users", userSchema);

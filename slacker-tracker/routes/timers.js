@@ -121,7 +121,7 @@ router.post(
       return res.status(422).json({ errors: errors.array() });
     }
 
-    if (!["work", "entertainment", "study"].includes(req.body.dutyName))
+    if (!["work", "play", "study"].includes(req.body.dutyName))
       return res.status(400).json({ message: "wrong duty name" });
 
     TimerModel.findOne({ _id: req.body._id }, (err, user) => {
@@ -188,7 +188,7 @@ router.post(
       return res.status(422).json({ errors: errors.array() });
     }
 
-    if (!["work", "entertainment", "study"].includes(req.body.dutyName))
+    if (!["work", "play", "study"].includes(req.body.dutyName))
       return res.status(400).json({ message: "wrong duty name" });
 
     TimerModel.findOne({ _id: req.body._id }, (err, user) => {
@@ -220,7 +220,7 @@ router.post(
           });
           newData.workTime.intervals = user.workTime.intervals;
           break;
-        case "entertainment":
+        case "play":
           newData.playTime = {};
           newData.playTime.totalTimeSpent =
             user.playTime.totalTimeSpent + dutyStopTime - user.duty.startTime;

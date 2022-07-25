@@ -727,7 +727,7 @@ router.get("/signout", function (req, res, next) {
         });
         newData.workTime.intervals = userTimer.workTime.intervals;
         break;
-      case "entertainment":
+      case "play":
         newData.playTime = {};
         newData.playTime.totalTimeSpent =
           userTimer.playTime.totalTimeSpent +
