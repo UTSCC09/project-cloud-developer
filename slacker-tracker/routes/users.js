@@ -425,15 +425,21 @@ router.post(
             startTime: userTimer.duty.startTime,
             endTime: loginTime,
           });
-          TimerModel.updateOne(
-            { _id: user._id },
-            {
+
+          let newLoginData = {};
+          if (userTimer.duty.name === "offline") {
+            newLoginData = {
               offlineTime: {
                 totalTimeSpent: newOfflineTotal,
                 intervals: userTimer.offlineTime.intervals,
               },
               duty: { name: "unallocate", startTime: Date.now() },
-            },
+            };
+          }
+
+          TimerModel.updateOne(
+            { _id: user._id },
+            newLoginData,
             { upsert: true },
             (err, data) => {
               if (err) return res.status(500).json({ message: err });
@@ -522,15 +528,21 @@ router.post(
               startTime: userTimer.duty.startTime,
               endTime: loginTime,
             });
-            TimerModel.updateOne(
-              { _id: user._id },
-              {
+
+            let newLoginData = {};
+            if (userTimer.duty.name === "offline") {
+              newLoginData = {
                 offlineTime: {
                   totalTimeSpent: newOfflineTotal,
                   intervals: userTimer.offlineTime.intervals,
                 },
                 duty: { name: "unallocate", startTime: Date.now() },
-              },
+              };
+            }
+
+            TimerModel.updateOne(
+              { _id: user._id },
+              newLoginData,
               { upsert: true },
               (err, data) => {
                 if (err) return res.status(500).json({ message: err });
@@ -589,15 +601,20 @@ router.post(
                         startTime: userTimer.duty.startTime,
                         endTime: loginTime,
                       });
-                      TimerModel.updateOne(
-                        { _id: existUser._id },
-                        {
+
+                      let newLoginData = {};
+                      if (userTimer.duty.name === "offline") {
+                        newLoginData = {
                           offlineTime: {
                             totalTimeSpent: newOfflineTotal,
                             intervals: userTimer.offlineTime.intervals,
                           },
                           duty: { name: "unallocate", startTime: Date.now() },
-                        },
+                        };
+                      }
+                      TimerModel.updateOne(
+                        { _id: existUser._id },
+                        newLoginData,
                         { upsert: true },
                         (err, data) => {
                           if (err) {
