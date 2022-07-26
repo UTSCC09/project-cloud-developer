@@ -220,11 +220,15 @@ router.get(
           .status(404)
           .json({ message: `user ${req.query._id} does not exist` });
       }
-      if (req.session.user._id != req.body._id)
+      if (req.session.user._id != req.query._id)
         return res.status(401).json({ message: "access denied" });
-      return res
-        .status(200)
-        .json({ message: "success", data: user.friendList });
+      FriendListModel.find({}, "_id name email", (err, allUsers) => {
+        if (err) return res.status(500).json({ message: err });
+        let friends = allUsers.filter((friend) =>
+          user.friendList.includes(friend._id)
+        );
+        return res.status(200).json({ message: "success", data: friends });
+      });
     });
   }
 );
@@ -248,7 +252,19 @@ router.get(
             .status(404)
             .json({ message: `user ${req.query._id} does not exist` });
         }
-        res.status(200).json({ message: "success", requests });
+
+        if (req.session.user._id != req.query._id)
+          return res.status(401).json({ message: "access denied" });
+
+        FriendListModel.find({}, "_id name email", (err, allUsers) => {
+          if (err) return res.status(500).json({ message: err });
+          let potentialFriends = allUsers.filter((potentialFriend) =>
+            requests.includes(potentialFriend._id)
+          );
+          return res
+            .status(200)
+            .json({ message: "success", data: potentialFriends });
+        });
       }
     );
   }

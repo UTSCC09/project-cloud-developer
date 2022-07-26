@@ -40,7 +40,8 @@ const userSchema = mongoose.Schema(
 
 const FriendListSchema = new Schema({
   _id: String, // primary
-  email: String,
+  email: String, //foreign key
+  name: String, //foreign key
   friendList: [String],
   sendedRequests: [String],
   receivedRequests: [String],
