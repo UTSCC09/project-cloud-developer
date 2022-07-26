@@ -86,24 +86,26 @@ const newFriendListData = function (
   return [newSenderData, newReceiverData];
 };
 
-const handleRequest = function (operation, senderId, receiverId, res) {
+const handleRequest = function (operation, senderEmail, receiverEmail, res) {
   let newSenderData;
   let newReceiverData;
 
-  FriendListModel.findOne({ _id: senderId }, "", (err, sender) => {
+  FriendListModel.findOne({ email: senderEmail }, "", (err, sender) => {
     if (err) return res.status(500).json({ message: err });
     if (!sender) {
       return res
         .status(404)
-        .json({ message: `user ${senderId} does not exist` });
+        .json({ message: `user ${senderEmail} does not exist` });
     }
-    FriendListModel.findOne({ _id: receiverId }, "", (err, receiver) => {
+    FriendListModel.findOne({ email: receiverEmail }, "", (err, receiver) => {
       if (err) return res.status(500).json({ message: err });
       if (!receiver) {
         return res
           .status(404)
-          .json({ message: `user ${receiverId} does not exist` });
+          .json({ message: `user ${receiverEmail} does not exist` });
       }
+      const senderId = sender._id;
+      const receiverId = receiver._id;
 
       switch (operation) {
         case "send":
@@ -256,8 +258,8 @@ router.post(
   "/sendRequest",
   auth.isAuthenticated,
   [
-    body("senderId").isString().trim().escape(),
-    body("receiverId").isString().trim().escape(),
+    body("senderEmail").isEmail().trim().escape(),
+    body("receiverEmail").isEmail().trim().escape(),
   ],
   (req, res, next) => {
     const errors = validationResult(req);
@@ -266,7 +268,7 @@ router.post(
     }
     if (req.session.user._id != req.body.senderId)
       return res.status(401).json({ message: "access denied" });
-    handleRequest("send", req.body.senderId, req.body.receiverId, res);
+    handleRequest("send", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
 
@@ -274,8 +276,8 @@ router.post(
   "/acceptRequest",
   auth.isAuthenticated,
   [
-    body("senderId").isString().trim().escape(),
-    body("receiverId").isString().trim().escape(),
+    body("senderEmail").isEmail().trim().escape(),
+    body("receiverEmail").isEmail().trim().escape(),
   ],
   (req, res) => {
     const errors = validationResult(req);
@@ -284,7 +286,7 @@ router.post(
     }
     if (req.session.user._id != req.body.receiverId)
       return res.status(401).json({ message: "access denied" });
-    handleRequest("accept", req.body.senderId, req.body.receiverId, res);
+    handleRequest("accept", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
 
@@ -292,8 +294,8 @@ router.post(
   "/cancelRequest",
   auth.isAuthenticated,
   [
-    body("senderId").isString().trim().escape(),
-    body("receiverId").isString().trim().escape(),
+    body("senderEmail").isEmail().trim().escape(),
+    body("receiverEmail").isEmail().trim().escape(),
   ],
   (req, res) => {
     const errors = validationResult(req);
@@ -305,7 +307,7 @@ router.post(
       req.session.user._id != req.body.receiverId
     )
       return res.status(401).json({ message: "access denied" });
-    handleRequest("cancel", req.body.senderId, req.body.receiverId, res);
+    handleRequest("cancel", req.body.senderEmail, req.body.receiverEmail, res);
   }
 );
 
@@ -313,8 +315,8 @@ router.delete(
   "/deleteFriend",
   auth.isAuthenticated,
   [
-    body("id1").isString().trim().escape(),
-    body("id2").isString().trim().escape(),
+    body("email1").isEmail().trim().escape(),
+    body("email2").isEmail().trim().escape(),
   ],
   (req, res) => {
     const errors = validationResult(req);
@@ -326,7 +328,7 @@ router.delete(
       req.session.email != req.body.email2
     )
       return res.status(401).json({ message: "access denied" });
-    handleRequest("delete", req.body.id1, req.body.id2, res);
+    handleRequest("delete", req.body.email1, req.body.email2, res);
   }
 );
 

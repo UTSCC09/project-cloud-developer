@@ -117,9 +117,16 @@ router.post(
       UserModel.updateOne(
         { _id: req.body._id },
         { email: req.body.email },
-        (err, data) => {
+        (err, data2) => {
           if (err) return res.status(500).json({ message: err });
-          return res.status(200).json({ message: "success", data });
+          FriendListModel.updateOne(
+            { _id: req.body._id },
+            { email: req.body.email },
+            (err, data) => {
+              if (err) return res.status(500).json({ message: err });
+              return res.status(200).json({ message: "success", data });
+            }
+          );
         }
       );
     });
@@ -320,6 +327,7 @@ router.post(
               // Create FriendListModel
               const newUserFriendList = {
                 _id: _id,
+                email: email,
                 friendList: [],
                 sendedRequests: [],
                 receivedRequests: [],
@@ -651,6 +659,7 @@ router.post(
                   // Create FriendListModel
                   const newUserFriendList = {
                     _id,
+                    email: email,
                     friendList: [],
                     sendedRequests: [],
                     receivedRequests: [],
