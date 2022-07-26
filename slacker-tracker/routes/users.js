@@ -411,7 +411,10 @@ router.post(
             return res
               .status(404)
               .json({ message: `user ${user._id} not found` });
-          if (userTimer.duty.name !== "offline")
+          if (
+            userTimer.duty.name !== "offline" &&
+            userTimer.duty.name !== "offline"
+          )
             return res.status(400).json({ message: "You have already login" });
           const loginTime = Date.now();
           const newOfflineTotal =
