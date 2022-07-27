@@ -73,6 +73,7 @@ code {
 a {
   color: rgb(27, 139, 213);
   text-decoration: none;
+  cursor: pointer;
 }
 
 .nav {

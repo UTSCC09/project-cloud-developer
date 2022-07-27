@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppBar, Badge, Box, Toolbar, Tooltip, Typography, Avatar, IconButton, MenuItem, Menu } from '@mui/material'
 import PeopleIcon from '@mui/icons-material/People'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
+// import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import axios from 'axios'
 import { useGoogleLogout } from 'react-google-login'
 import CONST from '../../CONST'
 import Cookies from 'js-cookie'
-// import LoginButton from '../../components/google_oauth2/login'
 import '../../index.css'
 
 export default function ButtonAppBar () {
   const pendingRequests = 0
   const [anchorElUser, setAnchorElUser] = useState(null)
   const [me, setMe] = useState(null)
+  const navigate = useNavigate()
 
   const onLogoutSuccess = () => {
     console.log('LOGOUT SUCCESS!')
@@ -23,20 +24,19 @@ export default function ButtonAppBar () {
     onLogoutSuccess
   })
 
-  const email = Cookies.get('email')
+  const _id = Cookies.get('_id')
 
   useEffect(() => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/user?email=${email}`,
+      url: `http://localhost:3001/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res.data.user)
       setMe(res.data.user)
     }).catch((err) => {
       console.log(err)
-      // go to sign in page if fail (once is enough)
-      window.location.href = './signin'
+      // navigate('/signin', { replace: true })
     })
     console.log(me)
   }, [])
@@ -72,14 +72,14 @@ export default function ButtonAppBar () {
             Slacker Tracker
           </Typography>
           <Box>
-            <Tooltip title="Timer" sx={{ marginRight: 3 }}>
+            {/* <Tooltip title="Timer" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
-                  <AccessTimeIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './timer' }}/>
+                  <AccessTimeIcon sx={{ cursor: 'pointer' }} onClick={() => navigate('/timer', { replace: true })}/>
               </Badge>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="Friends" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
-                  <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './friends' }}/>
+                  <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => navigate('/friends', { replace: true })}/>
               </Badge>
             </Tooltip>
           </Box>

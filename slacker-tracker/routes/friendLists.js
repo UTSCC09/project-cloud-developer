@@ -259,7 +259,7 @@ router.get(
         FriendListModel.find({}, "_id name email", (err, allUsers) => {
           if (err) return res.status(500).json({ message: err });
           let potentialFriends = allUsers.filter((potentialFriend) =>
-            requests.includes(potentialFriend._id)
+            requests.receivedRequests.includes(potentialFriend._id)
           );
           return res
             .status(200)
@@ -282,7 +282,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    if (req.session.user._id != req.body.senderId)
+    if (req.session.user.email != req.body.senderEmail)
       return res.status(401).json({ message: "access denied" });
     handleRequest("send", req.body.senderEmail, req.body.receiverEmail, res);
   }
@@ -300,7 +300,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    if (req.session.user._id != req.body.receiverId)
+    if (req.session.user.email != req.body.receiverEmail)
       return res.status(401).json({ message: "access denied" });
     handleRequest("accept", req.body.senderEmail, req.body.receiverEmail, res);
   }
@@ -319,8 +319,8 @@ router.post(
       return res.status(422).json({ errors: errors.array() });
     }
     if (
-      req.session.user._id != req.body.senderId &&
-      req.session.user._id != req.body.receiverId
+      req.session.user.email != req.body.senderEmail &&
+      req.session.user.email != req.body.receiverEmail
     )
       return res.status(401).json({ message: "access denied" });
     handleRequest("cancel", req.body.senderEmail, req.body.receiverEmail, res);
@@ -340,8 +340,8 @@ router.delete(
       return res.status(422).json({ errors: errors.array() });
     }
     if (
-      req.session.email != req.body.email1 &&
-      req.session.email != req.body.email2
+      req.session.user.email != req.body.email1 &&
+      req.session.user.email != req.body.email2
     )
       return res.status(401).json({ message: "access denied" });
     handleRequest("delete", req.body.email1, req.body.email2, res);

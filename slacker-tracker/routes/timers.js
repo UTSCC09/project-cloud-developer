@@ -25,7 +25,7 @@ router.get(
         workTimeSpent: userTimer.workTime.totalTimeSpent,
         studyTimeSpent: userTimer.studyTime.totalTimeSpent,
         playTimeSpent: userTimer.playTime.totalTimeSpent,
-        offlineTImeSpent: userTimer.offlineTime.totalTimeSpent,
+        offlineTimeSpent: userTimer.offlineTime.totalTimeSpent,
         unallocatedTime: userTimer.unallocatedTime.totalTimeSpent,
         duty: userTimer.duty,
       };

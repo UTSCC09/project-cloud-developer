@@ -51,7 +51,7 @@ export default function Login () {
         onFailure={onFailure}
         cookiePolicy={'single_host_origin'}
         isSignedIn={true}
-        buttonText='Login with Google'
+        buttonText='Google'
       />
     </div>
   )
