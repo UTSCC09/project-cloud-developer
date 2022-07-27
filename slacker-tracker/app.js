@@ -121,12 +121,38 @@ const server = http.createServer(app).listen(port, function (err) {
   else console.log('HTTP server on http://localhost:%s', port)
 })
 
-const io = require('socket.io')(server)
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+})
+let onlineUsersId = []
 
 io.on('connection', function(socket) {
-  console.log("a user connected")
+  socket.on('login', function(data){
+    console.log('a user ' + data._id + ' connected');
+    if (onlineUsersId.indexOf(data._id) ===  -1) {
+      onlineUsersId.push(data._id)
+    }
+    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
+    socket.emit('updateOnlineUsers', { onlineUsersId })
+  });
 
-  socket.on("disconnect", function() {
-    console.log("a user disconnected")
-  })
+  socket.on('logout', function(data){
+    console.log('a user ' + data._id + ' disconnected');
+    onlineUsersId = onlineUsersId.filter(userId => userId !== data._id)
+    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
+  });
+
+  socket.on('disconnect', function(){
+    console.log('user ' + socket.id + ' disconnected');
+  });
+
+  // setInterval(() => {
+  //   onlineUsersId.forEach((id, index) => {
+  //     socket.emit('updateOnlineUsers', "world")
+  //   })
+  // }, 1000)
 })
+

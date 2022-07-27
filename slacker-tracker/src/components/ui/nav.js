@@ -8,12 +8,20 @@ import { useGoogleLogout } from 'react-google-login'
 import CONST from '../../CONST'
 import Cookies from 'js-cookie'
 import '../../index.css'
+import { io } from 'socket.io-client'
+import PropTypes from 'prop-types'
 
-export default function ButtonAppBar () {
+ButtonAppBar.propTypes = {
+  setOnlineUsersId: PropTypes.any
+}
+
+export default function ButtonAppBar (props) {
   const pendingRequests = 0
   const [anchorElUser, setAnchorElUser] = useState(null)
   const [me, setMe] = useState(null)
   const navigate = useNavigate()
+  const socket = io('http://localhost:3001')
+  const { setOnlineUsersId } = props
 
   const onLogoutSuccess = () => {
     console.log('LOGOUT SUCCESS!')
@@ -34,9 +42,20 @@ export default function ButtonAppBar () {
     }).then((res) => {
       console.log(res.data.user)
       setMe(res.data.user)
+      socket.on('connect', () => {
+        console.log('socket connected')
+        socket.emit('login', { _id })
+      })
+      socket.on('connect_error', (err) => {
+        console.log(`connect_error due to ${err.message}`)
+      })
+      socket.on('updateOnlineUsers', onlineUsersId => {
+        setOnlineUsersId(onlineUsersId.onlineUsersId)
+        console.log(onlineUsersId)
+      })
     }).catch((err) => {
       console.log(err)
-      // navigate('/signin', { replace: true })
+      navigate('/signin', { replace: true })
     })
     console.log(me)
   }, [])
@@ -53,12 +72,13 @@ export default function ButtonAppBar () {
     signOut()
     axios({
       method: 'GET',
-      url: 'http://localhost:3001/api/user/signout'
+      url: 'http://localhost:3001/api/user/signout',
+      withCredentials: true
     }).then(res => {
       console.log(res)
       onLogoutSuccess()
+      socket.emit('logout', { _id })
       window.location.href = './signin'
-      document.cookie = 'email=""'
     }).catch(err => {
       console.log(err)
     })

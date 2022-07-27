@@ -436,8 +436,8 @@ router.post(
           const loginTime = new Date();
           const newOfflineTotal =
             userTimer.offlineTime.totalTimeSpent +
-            loginTime -
-            userTimer.duty.startTime;
+            loginTime.getTime() -
+            new Date(userTimer.duty.startTime).getTime();
           userTimer.offlineTime.intervals.push({
             startTime: userTimer.duty.startTime,
             endTime: loginTime,
@@ -764,8 +764,8 @@ router.get("/signout", function (req, res, next) {
         newData.workTime = {};
         newData.workTime.totalTimeSpent =
           userTimer.workTime.totalTimeSpent +
-          logoutTime -
-          userTimer.duty.startTime;
+          logoutTime.getTime() -
+          new Date(userTimer.duty.startTime).getTime();
         userTimer.workTime.intervals.push({
           startTime: userTimer.duty.startTime,
           endTime: logoutTime,
@@ -776,8 +776,8 @@ router.get("/signout", function (req, res, next) {
         newData.playTime = {};
         newData.playTime.totalTimeSpent =
           userTimer.playTime.totalTimeSpent +
-          logoutTime -
-          userTimer.duty.startTime;
+          logoutTime.getTime() -
+          new Date(userTimer.duty.startTime).getTime();
         userTimer.playTime.intervals.push({
           startTime: userTimer.duty.startTime,
           endTime: logoutTime,
@@ -788,8 +788,8 @@ router.get("/signout", function (req, res, next) {
         newData.studyTime = {};
         newData.studyTime.totalTimeSpent =
           userTimer.studyTime.totalTimeSpent +
-          logoutTime -
-          userTimer.duty.startTime;
+          logoutTime.getTime() -
+          new Date(userTimer.duty.startTime).getTime();
         userTimer.studyTime.intervals.push({
           startTime: userTimer.duty.startTime,
           endTime: logoutTime,
@@ -800,8 +800,8 @@ router.get("/signout", function (req, res, next) {
         newData.unallocatedTime = {};
         newData.unallocatedTime.totalTimeSpent =
           userTimer.unallocatedTime.totalTimeSpent +
-          logoutTime -
-          userTimer.duty.startTime;
+          logoutTime.getTime() -
+          new Date(userTimer.duty.startTime).getTime();
         userTimer.unallocatedTime.intervals.push({
           startTime: userTimer.duty.startTime,
           endTime: logoutTime,

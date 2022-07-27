@@ -3,10 +3,16 @@ import axios from 'axios'
 import { Avatar } from '@mui/material'
 import Cookies from 'js-cookie'
 import timeConvert from '../../utils/timeConvert'
+import PropTypes from 'prop-types'
 
-export default function Bubble () {
+Bubble.propTypes = {
+  onlineUsersId: PropTypes.any
+}
+
+export default function Bubble (props) {
   const [users, setUsers] = useState(null)
   const [me, setMe] = useState(null)
+  const [onlineUsersIdBubble, setonlineUsersIdBubble] = useState(props.onlineUsersId)
 
   const _id = Cookies.get('_id')
 
@@ -32,6 +38,11 @@ export default function Bubble () {
       console.log(err)
     })
   }, [])
+
+  useEffect(() => {
+    setonlineUsersIdBubble(props.onlineUsersId)
+    console.log(props.onlineUsersId)
+  }, [props.onlineUsersId])
 
   return (
     <div className="dashboard">
@@ -62,9 +73,14 @@ export default function Bubble () {
         <div key={user._id} className="bubble">
           <div>
             <div>
-              <Avatar className="avatar" src={user.avatar} />
+              <div className='status-container'>
+                <Avatar className="avatar" src={user.avatar} />
+                {(onlineUsersIdBubble.indexOf(user._id) !== -1)
+                  ? <div className='online-status-circle'></div>
+                  : <div className='offline-status-circle'></div>}
+              </div>
               <div className="name">
-                {user.friendName}
+                {user.name}
                 {/* <div className="bio">{user.email}</div> */}
               </div>
             </div>
