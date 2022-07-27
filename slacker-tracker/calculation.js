@@ -1,5 +1,11 @@
 const { parentPort } = require("worker_threads");
 const { UserModel, TimerModel } = require("./db");
+const mongoose = require("mongoose");
+
+const mongodbUrl =
+  process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
+
+mongoose.connect(mongodbUrl);
 
 const now = new Date();
 const weekStart = now.getDate() - 7;
@@ -63,7 +69,7 @@ const getWeeklyTotal = function (userTimerIntervals) {
   );
 
   let total = 0;
-  weeklyIntervals.foreach((interval) => {
+  weeklyIntervals.forEach((interval) => {
     total += interval.endTime - interval.startTime;
   });
   return total;
@@ -71,7 +77,7 @@ const getWeeklyTotal = function (userTimerIntervals) {
 
 TimerModel.find({}, (err, allUserTimers) => {
   if (err) throw new Error("Database error");
-  allUserTimers.foreach((userTimer) => {
+  allUserTimers.forEach((userTimer) => {
     // Numbers
     const workTimeWeeklyTotal = getWeeklyTotal(userTimer.workTime.intervals);
     const playTimeWeeklyTotal = getWeeklyTotal(userTimer.playTime.intervals);

@@ -6,6 +6,7 @@ import Bubble from '../../components/ui/bubble'
 import { Button, Tooltip, Paper } from '@mui/material'
 import WorkIcon from '@mui/icons-material/Work'
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset'
+import { io } from 'socket.io-client'
 
 function Home () {
   const [timerStarted, setTimerStarted] = React.useState(null)
@@ -22,6 +23,23 @@ function Home () {
       }
     }).catch((err) => {
       console.log(err)
+    })
+
+    const socket = io('http://localhost:3001', {
+      reconnectionDelay: 1000,
+      reconnection: true,
+      reconnectionAttemps: 10,
+      transports: ['websocket'],
+      agent: false,
+      upgrade: false,
+      rejectUnauthorized: false
+    })
+    console.log(socket)
+    socket.on('connect', () => {
+      console.log('socket connected')
+    })
+    socket.on('connect_error', (err) => {
+      console.log(`connect_error due to ${err.message}`)
     })
   }, [])
 

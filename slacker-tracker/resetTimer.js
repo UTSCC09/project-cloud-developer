@@ -1,5 +1,12 @@
 const { parentPort } = require("worker_threads");
 const { TimerModel } = require("./db");
+const mongoose = require("mongoose");
+
+const mongodbUrl =
+  process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
+
+mongoose.connect(mongodbUrl);
+
 
 const now = new Date();
 
@@ -12,7 +19,7 @@ const updataTimer = function (newData, _id) {
 // Reset every user's timer
 TimerModel.find({}, (err, allUserTimers) => {
   if (err) throw new Error("Database error");
-  allUserTimers.foreach((userTimer) => {
+  allUserTimers.forEach((userTimer) => {
     const dutyTimeSpent = now - userTimer.duty.startTime;
 
     let newData = { duty: { name: userTimer.duty.name, startTime: now } };

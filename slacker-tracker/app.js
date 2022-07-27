@@ -21,18 +21,13 @@ app.use(
   })
 );
 
-// const cookie = require('cookie')
-
-require("dotenv").config();
+require('dotenv').config()
 
 const mongodbUrl =
   process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
 const port = process.env.PORT || 3001;
 
 mongoose.connect(mongodbUrl);
-
-// const { isAuthenticated } = require("./auth");
-// app.use(isAuthenticated);
 
 app.use(function (req, res, next) {
   // let username = (req.session.user)? req.session.user._id : '';
@@ -121,7 +116,17 @@ cron.schedule(testFrequency, () => {
 const http = require("http");
 const { getByTestId } = require("@testing-library/react");
 
-http.createServer(app).listen(port, function (err) {
-  if (err) console.log(err);
-  else console.log("HTTP server on http://localhost:%s", port);
-});
+const server = http.createServer(app).listen(port, function (err) {
+  if (err) console.log(err)
+  else console.log('HTTP server on http://localhost:%s', port)
+})
+
+const io = require('socket.io')(server)
+
+io.on('connection', function(socket) {
+  console.log("a user connected")
+
+  socket.on("disconnect", function() {
+    console.log("a user disconnected")
+  })
+})
