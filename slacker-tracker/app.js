@@ -1,6 +1,8 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
+const { Worker } = require('worker_threads')
+const { UserModel, TimerModel } = require("./db");
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -43,6 +45,43 @@ app.use(function (req, res, next) {
   console.log('HTTP request', req.method, req.url, req.body)
   next()
 })
+
+app.get(
+  "/api/generateSummaryEmail",
+  (req, res, next) => {
+    if (!req.query._id) return res.status(400).json({ message: "missing _id in request query" })
+    if (!req.query.sendEmail) return res.status(400).json({ message: "missing sendEmail in request query" })
+
+    TimerModel.findOne({ _id: req.query._id }, (err, userTimer) => {
+      if (err) return res.status(500).json({ message: err });
+      if (!userTimer) {
+        return res
+          .status(404)
+          .json({ message: `user ${req.query._id} does not exist` });
+      }
+      let workerData = {
+        workTimeSpent: userTimer.workTime.totalTimeSpent,
+        playTimeSpent: userTimer.playTime.totalTimeSpent,
+        offlineTimeSpent: userTimer.offlineTime.totalTimeSpent,
+        unallocatedTime: userTimer.unallocatedTime.totalTimeSpent,
+      };
+      UserModel.findOne(
+        { _id: req.query._id },
+        "name slackerScore",
+        (err, user) => {
+          if (err) return res.status(500).json({ message: err });
+          workerData._id = req.query._id;
+          workerData.name = user.name;
+          workerData.slackerScore = user.slackerScore;
+          workerData.sendEmail = req.query.sendEmail
+          const worker = new Worker('./mailer.js', { workerData });
+          worker.on('message', () => res.status(200).json({ message: "success" }));
+          worker.on('error', () => res.status(500).json({ message: "fail" }));
+        }
+      );
+    });
+  }
+);
 
 const users = require('./routes/users')
 app.use('/api/user', users)

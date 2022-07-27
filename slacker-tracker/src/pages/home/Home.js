@@ -11,6 +11,20 @@ function Home () {
   const [timerStarted, setTimerStarted] = React.useState(null)
   const _id = Cookies.get('_id')
 
+  React.useEffect(() => {
+    axios({
+      method: 'GET',
+      url: `http://localhost:3001/api/timer/self?_id=${_id}`,
+      withCredentials: true
+    }).then((res) => {
+      if (res.data.data.duty.name !== 'unallocate' && res.data.data.duty.name !== 'offline') {
+        setTimerStarted(res.data.data.duty.name)
+      }
+    }).catch((err) => {
+      console.log(err)
+    })
+  }, [])
+
   const handleStartWorkTimer = () => {
     axios({
       method: 'POST',
@@ -88,7 +102,7 @@ function Home () {
         timerStarted &&
         <Paper sx={{ position: 'fixed', right: 20, bottom: 20 }}>
           <Button variant="contained" color='error' onClick={handleStopTimer}>
-              Stop
+              Stop {timerStarted !== 'play' ? timerStarted : 'game'} Timer
           </Button>
         </Paper>
       }
