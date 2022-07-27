@@ -141,7 +141,7 @@ router.post(
         });
       }
 
-      const dutyStartTime = Date.now();
+      const dutyStartTime = new Date();
       const newUnallocateTimeSpent =
         user.unallocatedTime.totalTimeSpent -
         user.duty.startTime +
@@ -207,7 +207,7 @@ router.post(
           message: `You cannot stop ${req.body.dutyName} because you are on ${user.duty.name}`,
         });
 
-      const dutyStopTime = Date.now();
+      const dutyStopTime = new Date();
       let newData = { duty: { name: "unallocate", startTime: dutyStopTime } };
       switch (req.body.dutyName) {
         case "work":

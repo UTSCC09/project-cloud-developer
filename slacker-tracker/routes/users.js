@@ -349,6 +349,7 @@ router.post(
                 }
               );
 
+              const now = new Date();
               // Create TimerModel
               const newUserTimer = {
                 _id: _id,
@@ -372,7 +373,7 @@ router.post(
                   totalTimeSpent: 0,
                   intervals: [],
                 },
-                duty: { name: "offline", startTime: Date.now() },
+                duty: { name: "offline", startTime: now },
               };
               TimerModel.updateOne(
                 { _id },
@@ -432,7 +433,7 @@ router.post(
           //   userTimer.duty.name !== "unallocate"
           // )
           //   return res.status(400).json({ message: "You have already login" });
-          const loginTime = Date.now();
+          const loginTime = new Date();
           const newOfflineTotal =
             userTimer.offlineTime.totalTimeSpent +
             loginTime -
@@ -449,7 +450,7 @@ router.post(
                 totalTimeSpent: newOfflineTotal,
                 intervals: userTimer.offlineTime.intervals,
               },
-              duty: { name: "unallocate", startTime: Date.now() },
+              duty: { name: "unallocate", startTime: loginTime },
             };
           }
 
@@ -535,7 +536,7 @@ router.post(
               return res
                 .status(400)
                 .json({ message: "You have already login" });
-            const loginTime = Date.now();
+            const loginTime = new Date();
             const newOfflineTotal =
               userTimer.offlineTime.totalTimeSpent +
               loginTime -
@@ -552,7 +553,7 @@ router.post(
                   totalTimeSpent: newOfflineTotal,
                   intervals: userTimer.offlineTime.intervals,
                 },
-                duty: { name: "unallocate", startTime: Date.now() },
+                duty: { name: "unallocate", startTime: loginTime },
               };
             }
 
@@ -608,7 +609,7 @@ router.post(
                         return res
                           .status(400)
                           .json({ message: "You have already login" });
-                      const loginTime = Date.now();
+                      const loginTime = new Date();
                       const newOfflineTotal =
                         userTimer.offlineTime.totalTimeSpent +
                         loginTime -
@@ -625,7 +626,7 @@ router.post(
                             totalTimeSpent: newOfflineTotal,
                             intervals: userTimer.offlineTime.intervals,
                           },
-                          duty: { name: "unallocate", startTime: Date.now() },
+                          duty: { name: "unallocate", startTime: loginTime },
                         };
                       }
                       TimerModel.updateOne(
@@ -681,7 +682,7 @@ router.post(
                       if (err) return res.status(500).json({ message: err });
                     }
                   );
-
+                  const now = new Date();
                   // Create TimerModel
                   const newUserTimer = {
                     _id: _id,
@@ -705,7 +706,7 @@ router.post(
                       totalTimeSpent: 0,
                       intervals: [],
                     },
-                    duty: { name: "unallocate", startTime: Date.now() },
+                    duty: { name: "unallocate", startTime: now },
                   };
                   TimerModel.updateOne(
                     { _id },
@@ -755,9 +756,9 @@ router.get("/signout", function (req, res, next) {
         .json({ message: `user ${req.session.user._id} not found` });
     if (userTimer.duty.name === "offline")
       return res.status(400).json({ message: "You have already logout" });
-    const logoutTime = Date.now();
+    const logoutTime = new Date();
 
-    let newData = { duty: { name: "offline", startTime: Date.now() } };
+    let newData = { duty: { name: "offline", startTime: logoutTime } };
     switch (userTimer.duty.name) {
       case "work":
         newData.workTime = {};
