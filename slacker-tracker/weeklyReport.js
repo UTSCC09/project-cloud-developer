@@ -6,6 +6,7 @@ const mongodbUrl =
 
 mongoose.connect(mongodbUrl);
 const { UserModel, TimerModel } = require("./db");
+const { concatAST } = require("graphql");
 
 const now = new Date();
 
@@ -27,9 +28,9 @@ const calculateSlackerScore = function (
   }
 
   let preRatio = 0;
-  if (limit.at(0) < actualTotal && actualTotal < good.at(0)) {
+  if (limit.at(0) <= actualTotal && actualTotal < good.at(0)) {
     preRatio = (actualTotal - limit.at(0)) / (good.at(0) - limit.at(0));
-  } else if (good.at(1) < actualTotal && actualTotal < limit.at(1)) {
+  } else if (good.at(1) < actualTotal && actualTotal <= limit.at(1)) {
     preRatio = (limit.at(1) - actualTotal) / (limit.at(1) - good.at(1));
   }
   const ratio =
@@ -42,7 +43,10 @@ const calculateSlackerScore = function (
 
 const setSlackerScore = function (lastWeekTimer, newTimerData) {
   UserModel.findOne({ _id: lastWeekTimer._id }, "slackerScore", (err, user) => {
-    if (err || !user) throw new Error("Update error");
+    if (err || !user) {
+      console.log("setSlackerScore error");
+      throw new Error("setSlackerScore error");
+    }
     const workTimeTotal = lastWeekTimer.workTimeWeeklyTotal;
     const playTimeTotal = lastWeekTimer.playTimeWeeklyTotal;
     const offlineTimeTotal = lastWeekTimer.offlineTimeWeeklyTotal;
@@ -86,14 +90,14 @@ const setSlackerScore = function (lastWeekTimer, newTimerData) {
     );
 
     // good: unallocate <= 2 hours
-    // limit: otherwise
+    // limit: unallocate <= 8
     // Base = 5
     // Correction = 1
     evaluation += calculateSlackerScore(
       5,
       1,
       [0, 2],
-      [2, 168],
+      [2, 8],
       unallocatedTimeTotal
     );
 
@@ -112,13 +116,19 @@ const setSlackerScore = function (lastWeekTimer, newTimerData) {
       },
       { upsert: true },
       (err, data) => {
-        if (err) throw new Error("Slacker score update error");
+        if (err) {
+          console.log("UserModel update error");
+          throw new Error("UserModel update error");
+        }
         TimerModel.updateOne(
           { _id: lastWeekTimer._id },
           newTimerData,
           { upsert: true },
           (err, data) => {
-            if (err) throw new Error("Duty update error");
+            if (err) {
+              console.log("Timer update error");
+              throw new Error("Timer update error");
+            }
           }
         );
       }
@@ -126,14 +136,18 @@ const setSlackerScore = function (lastWeekTimer, newTimerData) {
   });
 };
 
+console.log("Generating weekly report");
 TimerModel.find({}, (err, allUserTimers) => {
-  if (err) throw new Error("Database error");
+  if (err) {
+    console.log("Timer find error");
+    throw new Error("Database error");
+  }
   allUserTimers.forEach((userTimer) => {
     // Numbers
-    const workTimeWeeklyTotal = userTimer.workTime.totalTimeSpent;
-    const playTimeWeeklyTotal = userTimer.playTime.totalTimeSpent;
-    const offlineTimeWeeklyTotal = userTimer.offlineTime.totalTimeSpent;
-    const unallocatedTimeWeeklyTotal = userTimer.unallocatedTime.totalTimeSpent;
+    let workTimeWeeklyTotal = userTimer.workTime.totalTimeSpent;
+    let playTimeWeeklyTotal = userTimer.playTime.totalTimeSpent;
+    let offlineTimeWeeklyTotal = userTimer.offlineTime.totalTimeSpent;
+    let unallocatedTimeWeeklyTotal = userTimer.unallocatedTime.totalTimeSpent;
 
     const newTimerData = {
       workTime: {
@@ -158,7 +172,6 @@ TimerModel.find({}, (err, allUserTimers) => {
       },
       duty: { name: userTimer.duty.name, startTime: now },
     };
-
     const dutyTimeSpent =
       now.getTime() - new Date(userTimer.duty.startTime).getTime();
 
@@ -189,8 +202,8 @@ TimerModel.find({}, (err, allUserTimers) => {
     };
     try {
       setSlackerScore(lastWeekTimer, newTimerData);
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      throw error;
     }
   });
 });
