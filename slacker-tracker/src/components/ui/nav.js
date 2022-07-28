@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppBar, Badge, Box, Toolbar, Tooltip, Typography, Avatar, IconButton, MenuItem, Menu } from '@mui/material'
 import PeopleIcon from '@mui/icons-material/People'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import axios from 'axios'
 import { useGoogleLogout } from 'react-google-login'
 import CONST from '../../CONST'
 import Cookies from 'js-cookie'
-// import LoginButton from '../../components/google_oauth2/login'
 import '../../index.css'
+import { io } from 'socket.io-client'
+import PropTypes from 'prop-types'
 
-export default function ButtonAppBar () {
+ButtonAppBar.propTypes = {
+  setOnlineUsersId: PropTypes.any
+}
+
+export default function ButtonAppBar (props) {
   const pendingRequests = 0
   const [anchorElUser, setAnchorElUser] = useState(null)
   const [me, setMe] = useState(null)
+  const navigate = useNavigate()
+  const socket = io('http://localhost:3001')
+  const { setOnlineUsersId } = props
 
   const onLogoutSuccess = () => {
     console.log('LOGOUT SUCCESS!')
@@ -23,20 +32,30 @@ export default function ButtonAppBar () {
     onLogoutSuccess
   })
 
-  const email = Cookies.get('email')
+  const _id = Cookies.get('_id')
 
   useEffect(() => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/user?email=${email}`,
+      url: `http://localhost:3001/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res.data.user)
       setMe(res.data.user)
+      socket.on('connect', () => {
+        console.log('socket connected')
+        socket.emit('login', { _id })
+      })
+      socket.on('connect_error', (err) => {
+        console.log(`connect_error due to ${err.message}`)
+      })
+      socket.on('updateOnlineUsers', onlineUsersId => {
+        setOnlineUsersId(onlineUsersId.onlineUsersId)
+        console.log(onlineUsersId)
+      })
     }).catch((err) => {
       console.log(err)
-      // go to sign in page if fail (once is enough)
-      window.location.href = './signin'
+      // navigate('/signin', { replace: true })
     })
     console.log(me)
   }, [])
@@ -53,12 +72,13 @@ export default function ButtonAppBar () {
     signOut()
     axios({
       method: 'GET',
-      url: 'http://localhost:3001/api/user/signout'
+      url: 'http://localhost:3001/api/user/signout',
+      withCredentials: true
     }).then(res => {
       console.log(res)
       onLogoutSuccess()
+      socket.emit('logout', { _id })
       window.location.href = './signin'
-      document.cookie = 'email=""'
     }).catch(err => {
       console.log(err)
     })
@@ -72,14 +92,14 @@ export default function ButtonAppBar () {
             Slacker Tracker
           </Typography>
           <Box>
-            <Tooltip title="Timer" sx={{ marginRight: 3 }}>
+            <Tooltip title="Summary" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
-                  <AccessTimeIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './timer' }}/>
+                  <CalendarMonthIcon sx={{ cursor: 'pointer' }} onClick={() => navigate('/summary', { replace: true })}/>
               </Badge>
             </Tooltip>
             <Tooltip title="Friends" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
-                  <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => { window.location.href = './friends' }}/>
+                  <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => navigate('/friends', { replace: true })}/>
               </Badge>
             </Tooltip>
           </Box>

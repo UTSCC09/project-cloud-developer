@@ -2,7 +2,6 @@ import React from 'react'
 // import axios from 'axios'
 import AddFriends from './addFriends/AddFriends'
 import All from './all/All'
-import Online from './online/Online'
 import Pending from './pending/Pending'
 import PropTypes from 'prop-types'
 import './Friends.css'
@@ -32,21 +31,17 @@ function Friends () {
                   value={value}
                   onChange={handleChange}
                   sx={{ borderRight: 1, borderColor: 'divider' }}>
-                <Tab sx={{ color: 'white' }} label="Online" {...a11yProps(0)}/>
-                <Tab sx={{ color: 'white' }} label="All" {...a11yProps(1)}/>
-                <Tab sx={{ color: 'white' }} label="Pending" {...a11yProps(2)}/>
-                <Tab sx={{ color: 'white' }} label="Add Friends" {...a11yProps(3)}/>
+                <Tab sx={{ color: 'white' }} label="All" {...a11yProps(0)}/>
+                <Tab sx={{ color: 'white' }} label="Pending" {...a11yProps(1)}/>
+                <Tab sx={{ color: 'white' }} label="Add Friends" {...a11yProps(2)}/>
             </Tabs>
             <TabPanel value={value} index={0}>
-                <Online />
-            </TabPanel>
-            <TabPanel value={value} index={1}>
                 <All />
             </TabPanel>
-            <TabPanel value={value} index={2}>
+            <TabPanel value={value} index={1}>
                 <Pending />
             </TabPanel>
-            <TabPanel value={value} index={3}>
+            <TabPanel value={value} index={2}>
                 <AddFriends />
             </TabPanel>
         </Box>

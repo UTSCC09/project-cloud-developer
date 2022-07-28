@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import './Signin.css'
 import LoginButton from '../../components/google_oauth2/login'
@@ -11,6 +12,7 @@ import Alert from '@mui/material/Alert'
 function Signin () {
   const [missingFieldAlert, setMissingFieldAlert] = useState(false)
   const [serverAlert, setServerAlert] = useState(null)
+  const navigate = useNavigate()
   const handleSignin = () => {
     setMissingFieldAlert(false)
     setServerAlert(null)
@@ -30,13 +32,21 @@ function Signin () {
       withCredentials: true
     }).then((res) => {
       console.log(res)
-      document.cookie = `email=${res.data.user.email}`
-      window.location.href = './home'
+      navigateToHome()
     }).catch((err) => {
       console.log(err)
-      setServerAlert(err.response.data.message)
+      setServerAlert(err.response.data.message || 'Please type in a valid email address')
     })
   }
+
+  const navigateToHome = () => {
+    navigate('/home', { replace: true })
+  }
+
+  const navigateToSignup = () => {
+    navigate('/signup', { replace: true })
+  }
+
   return (
     <div>
         <Box id="signin-box">
@@ -52,7 +62,7 @@ function Signin () {
                     <br/>
                     <Button id="signin-button" variant="contained" onClick={handleSignin}>Sign In</Button>
                     <div className='signin-text'>
-                        Need an account? <a href='/signup'>Register</a>
+                        Need an account? <a onClick={() => navigateToSignup()}>Register</a>
                     </div>
                 </Grid>
                 <Grid item xs={4}>

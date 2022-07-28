@@ -16,25 +16,37 @@ function AddFriends () {
     setSendSuccess(false)
 
     const receiverEmail = document.getElementById('add-friends-email-input').value
-    const senderEmail = Cookies.get('email')
+    const _id = Cookies.get('_id')
 
     if (!receiverEmail) return setMissingFieldAlert(true)
-    if (!senderEmail) return setMissingCookieAlert(true)
+    if (!_id) return setMissingCookieAlert(true)
 
     axios({
-      method: 'POST',
-      url: 'http://localhost:3001/api/friendList/sendRequest',
-      data: {
-        receiverEmail,
-        senderEmail
-      },
+      method: 'GET',
+      url: `http://localhost:3001/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
-      setSendSuccess(true)
+      console.log(res.data.user.email)
+      const senderEmail = res.data.user.email
+      axios({
+        method: 'POST',
+        url: 'http://localhost:3001/api/friendList/sendRequest',
+        data: {
+          receiverEmail,
+          senderEmail
+        },
+        withCredentials: true
+      }).then((res) => {
+        console.log(res)
+        setSendSuccess(true)
+      }).catch((err) => {
+        console.log(err)
+        setServerAlert(err.response.data.message || 'Please type in a valid email')
+      })
     }).catch((err) => {
       console.log(err)
-      setServerAlert(err.response.data.message || 'Please type in a valid email')
+      return setServerAlert(err.response.data.message || 'Please type in a valid email')
     })
   }
   return (
