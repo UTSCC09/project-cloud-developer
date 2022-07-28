@@ -61,24 +61,16 @@ const sendEmail = async (emailOptions) => {
     await emailTransporter.sendMail(emailOptions);
 };
 
-// workTimeSpent: userTimer.workTime.totalTimeSpent,
-// playTimeSpent: userTimer.playTime.totalTimeSpent,
-// offlineTimeSpent: userTimer.offlineTime.totalTimeSpent,
-// unallocatedTime: userTimer.unallocatedTime.totalTimeSpent,
-// workerData._id = req.query._id;
-// workerData.name = user.name;
-// workerData.slackerScore = user.slackerScore;
-
 console.log('workerdata', workerData)
 const sendHTML = 
 `<div>
   <h2>Hello! Here is slacker tracker daily summary of <span style="color:#0d6efd;">${workerData.name}</span>!</h2>
   <br/>
   <h2>Your Slacker Score: <span style="color:#0d6efd;">${workerData.slackerScore}</span><span></h2>
-  <h3>Total Work Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.workTimeSpent)}</span></h3>
-  <h3>Total Game Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.playTimeSpent)}</span></h3>
-  <h3>Total Offline Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.offlineTimeSpent)}</span></h3>
-  <h3>Total Unallocated Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.unallocatedTime)}</span></h3>
+  <h3>Total Work Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.workTimeTotal)}</span></h3>
+  <h3>Total Game Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.playTimeTotal)}</span></h3>
+  <h3>Total Offline Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.offlineTimeTotal)}</span></h3>
+  <h3>Total Unallocated Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.unallocatedTimeTotal)}</span></h3>
 </div>`
 
 sendEmail({

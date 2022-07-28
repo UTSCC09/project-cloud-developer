@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppBar, Badge, Box, Toolbar, Tooltip, Typography, Avatar, IconButton, MenuItem, Menu } from '@mui/material'
 import PeopleIcon from '@mui/icons-material/People'
-// import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import axios from 'axios'
 import { useGoogleLogout } from 'react-google-login'
 import CONST from '../../CONST'
@@ -55,7 +55,7 @@ export default function ButtonAppBar (props) {
       })
     }).catch((err) => {
       console.log(err)
-      navigate('/signin', { replace: true })
+      // navigate('/signin', { replace: true })
     })
     console.log(me)
   }, [])
@@ -92,11 +92,11 @@ export default function ButtonAppBar (props) {
             Slacker Tracker
           </Typography>
           <Box>
-            {/* <Tooltip title="Timer" sx={{ marginRight: 3 }}>
+            <Tooltip title="Summary" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
-                  <AccessTimeIcon sx={{ cursor: 'pointer' }} onClick={() => navigate('/timer', { replace: true })}/>
+                  <CalendarMonthIcon sx={{ cursor: 'pointer' }} onClick={() => navigate('/summary', { replace: true })}/>
               </Badge>
-            </Tooltip> */}
+            </Tooltip>
             <Tooltip title="Friends" sx={{ marginRight: 3 }}>
               <Badge color="secondary">
                   <PeopleIcon sx={{ cursor: 'pointer' }} onClick={() => navigate('/friends', { replace: true })}/>

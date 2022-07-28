@@ -49,37 +49,26 @@ app.get("/api/generateSummaryEmail", (req, res, next) => {
     return res
       .status(400)
       .json({ message: "missing sendEmail in request query" });
-
-  TimerModel.findOne({ _id: req.query._id }, (err, userTimer) => {
-    if (err) return res.status(500).json({ message: err });
-    if (!userTimer) {
-      return res
-        .status(404)
-        .json({ message: `user ${req.query._id} does not exist` });
+  UserModel.findOne(
+    { _id: req.query._id },
+    (err, user) => {
+      if (err) return res.status(500).json({ message: err });
+      let workerData = {}
+      workerData.name = user.name;
+      workerData.workTimeTotal = user.lastWeekReport.workTimeTotal;
+      workerData.playTimeTotal = user.lastWeekReport.playTimeTotal;
+      workerData.unallocatedTimeTotal = user.lastWeekReport.unallocatedTimeTotal;
+      workerData.offlineTimeTotal = user.lastWeekReport.offlineTimeTotal;
+      workerData.slackerScore = user.slackerScore;
+      workerData.sendEmail = req.query.sendEmail;
+      console.log('data', workerData)
+      const worker = new Worker("./mailer.js", { workerData });
+      worker.on("message", () =>
+        res.status(200).json({ message: "success" })
+      );
+      worker.on("error", () => res.status(500).json({ message: "fail" }));
     }
-    let workerData = {
-      workTimeSpent: userTimer.workTime.totalTimeSpent,
-      playTimeSpent: userTimer.playTime.totalTimeSpent,
-      offlineTimeSpent: userTimer.offlineTime.totalTimeSpent,
-      unallocatedTime: userTimer.unallocatedTime.totalTimeSpent,
-    };
-    UserModel.findOne(
-      { _id: req.query._id },
-      "name slackerScore",
-      (err, user) => {
-        if (err) return res.status(500).json({ message: err });
-        workerData._id = req.query._id;
-        workerData.name = user.name;
-        workerData.slackerScore = user.slackerScore;
-        workerData.sendEmail = req.query.sendEmail;
-        const worker = new Worker("./mailer.js", { workerData });
-        worker.on("message", () =>
-          res.status(200).json({ message: "success" })
-        );
-        worker.on("error", () => res.status(500).json({ message: "fail" }));
-      }
-    );
-  });
+  );
 });
 
 const users = require("./routes/users");
@@ -102,7 +91,7 @@ const testFrequency = "5 * * * * *";
 // * means every
 // at second minutes hours date month day-of-week
 //     "*      *      *     *     *       *""
-cron.schedule(calculationFrequency, () => {
+cron.schedule(testFrequency, () => {
   const workerReset = new Worker("./weeklyReport.js");
   workerReset.on("message", () => {
     console.log("Weekly report generation complete!");

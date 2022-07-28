@@ -5,6 +5,7 @@ import Signin from './pages/signin/Signin'
 import Signup from './pages/signup/Signup'
 import Friends from './pages/friends/Friends'
 import TimerView from './pages/timerView/TimerView'
+import Summary from './pages/summary/Summary'
 
 function App () {
   return (
@@ -15,6 +16,7 @@ function App () {
         <Route path="/signup" element={<Signup />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/timer" element={<TimerView />} />
+        <Route path="/summary" element={<Summary />} />
         <Route path="*" element={<Signin />} />
       </Routes>
     </div>
