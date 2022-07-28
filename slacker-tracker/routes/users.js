@@ -323,6 +323,12 @@ router.post(
             authentication_type: "standard",
             slackerScore: 0,
             bio: "",
+            lastWeekReport: {
+              workTimeTotal: 0,
+              playTimeTotal: 0,
+              offlineTimeTotal: 0,
+              unallocatedTimeTotal: 0,
+            },
           };
           UserModel.updateOne(
             { _id: _id },
@@ -504,6 +510,12 @@ router.post(
       access_token: req.body.access_token,
       slackerScore: 0,
       bio: "",
+      lastWeekReport: {
+        workTimeTotal: 0,
+        playTimeTotal: 0,
+        offlineTimeTotal: 0,
+        unallocatedTimeTotal: 0,
+      },
     };
 
     UserModel.findOne(
@@ -539,8 +551,8 @@ router.post(
             const loginTime = new Date();
             const newOfflineTotal =
               userTimer.offlineTime.totalTimeSpent +
-              loginTime -
-              userTimer.duty.startTime;
+              loginTime.getTime() -
+              new Date(userTimer.duty.startTime).getTime();
             userTimer.offlineTime.intervals.push({
               startTime: userTimer.duty.startTime,
               endTime: loginTime,
@@ -612,8 +624,8 @@ router.post(
                       const loginTime = new Date();
                       const newOfflineTotal =
                         userTimer.offlineTime.totalTimeSpent +
-                        loginTime -
-                        userTimer.duty.startTime;
+                        loginTime.getTime() -
+                        new Date(userTimer.duty.startTime).getTime();
                       userTimer.offlineTime.intervals.push({
                         startTime: userTimer.duty.startTime,
                         endTime: loginTime,

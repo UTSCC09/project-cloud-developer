@@ -144,8 +144,8 @@ router.post(
       const dutyStartTime = new Date();
       const newUnallocateTimeSpent =
         user.unallocatedTime.totalTimeSpent -
-        user.duty.startTime +
-        dutyStartTime;
+        new Date(user.duty.startTime).getTime() +
+        dutyStartTime.getTime();
       user.unallocatedTime.intervals.push({
         startTime: user.duty.startTime,
         endTime: dutyStartTime,
@@ -213,7 +213,9 @@ router.post(
         case "work":
           newData.workTime = {};
           newData.workTime.totalTimeSpent =
-            user.workTime.totalTimeSpent + dutyStopTime - user.duty.startTime;
+            user.workTime.totalTimeSpent +
+            dutyStopTime.getTime() -
+            new Date(user.duty.startTime).getTime();
           user.workTime.intervals.push({
             startTime: user.duty.startTime,
             endTime: dutyStopTime,
@@ -223,7 +225,9 @@ router.post(
         case "play":
           newData.playTime = {};
           newData.playTime.totalTimeSpent =
-            user.playTime.totalTimeSpent + dutyStopTime - user.duty.startTime;
+            user.playTime.totalTimeSpent +
+            dutyStopTime.getTime() -
+            new Date(user.duty.startTime).getTime();
           user.playTime.intervals.push({
             startTime: user.duty.startTime,
             endTime: dutyStopTime,
@@ -233,7 +237,9 @@ router.post(
         case "study":
           newData.studyTime = {};
           newData.studyTime.totalTimeSpent =
-            user.studyTime.totalTimeSpent + dutyStopTime - user.duty.startTime;
+            user.studyTime.totalTimeSpent +
+            dutyStopTime.getTime() -
+            new Date(user.duty.startTime).getTime();
           user.studyTime.intervals.push({
             startTime: user.duty.startTime,
             endTime: dutyStopTime,

@@ -21,7 +21,7 @@ app.use(
   })
 );
 
-require('dotenv').config()
+require("dotenv").config();
 
 const mongodbUrl =
   process.env.MONGODB_URL || "mongodb://localhost:27017/slacker-tracker";
@@ -102,51 +102,49 @@ const testFrequency = "5 * * * * *";
 // * means every
 // at second minutes hours date month day-of-week
 //     "*      *      *     *     *       *""
-cron.schedule(testFrequency, () => {
-  const workerReset = new Worker("./resetTimer.js");
+cron.schedule(calculationFrequency, () => {
+  console.log("Generating weekly report");
+  const workerReset = new Worker("./weeklyReport.js");
   workerReset.on("message", () => {
-    console.log("Reset complete. Now calculating slacker score...");
-    const workerCalculation = new Worker("./calculation.js");
-    workerCalculation.on("message", () => console.log("Calculation complete!"));
-    workerCalculation.on("error", () => console.log("Calculation failed!"));
+    console.log("Weekly report generation complete!");
   });
-  workerReset.on("error", () => console.log("Timer reset failed!"));
+  workerReset.on("error", () => console.log("Weekly report generation fail!!"));
 });
 
 const http = require("http");
 const { getByTestId } = require("@testing-library/react");
 
 const server = http.createServer(app).listen(port, function (err) {
-  if (err) console.log(err)
-  else console.log('HTTP server on http://localhost:%s', port)
-})
+  if (err) console.log(err);
+  else console.log("HTTP server on http://localhost:%s", port);
+});
 
-const io = require('socket.io')(server, {
+const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-})
-let onlineUsersId = []
+    methods: ["GET", "POST"],
+  },
+});
+let onlineUsersId = [];
 
-io.on('connection', function(socket) {
-  socket.on('login', function(data){
-    console.log('a user ' + data._id + ' connected');
-    if (onlineUsersId.indexOf(data._id) ===  -1) {
-      onlineUsersId.push(data._id)
+io.on("connection", function (socket) {
+  socket.on("login", function (data) {
+    console.log("a user " + data._id + " connected");
+    if (onlineUsersId.indexOf(data._id) === -1) {
+      onlineUsersId.push(data._id);
     }
-    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
-    socket.emit('updateOnlineUsers', { onlineUsersId })
+    socket.broadcast.emit("updateOnlineUsers", { onlineUsersId });
+    socket.emit("updateOnlineUsers", { onlineUsersId });
   });
 
-  socket.on('logout', function(data){
-    console.log('a user ' + data._id + ' disconnected');
-    onlineUsersId = onlineUsersId.filter(userId => userId !== data._id)
-    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
+  socket.on("logout", function (data) {
+    console.log("a user " + data._id + " disconnected");
+    onlineUsersId = onlineUsersId.filter((userId) => userId !== data._id);
+    socket.broadcast.emit("updateOnlineUsers", { onlineUsersId });
   });
 
-  socket.on('disconnect', function(){
-    console.log('user ' + socket.id + ' disconnected');
+  socket.on("disconnect", function () {
+    console.log("user " + socket.id + " disconnected");
   });
 
   // setInterval(() => {
@@ -154,5 +152,4 @@ io.on('connection', function(socket) {
   //     socket.emit('updateOnlineUsers', "world")
   //   })
   // }, 1000)
-})
-
+});

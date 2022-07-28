@@ -34,6 +34,12 @@ const userSchema = mongoose.Schema(
       type: Number,
       required: true, // initialized to be 5
     },
+    lastWeekReport: {
+      workTimeTotal: Number,
+      playTimeTotal: Number,
+      offlineTimeTotal: Number,
+      unallocatedTimeTotal: Number,
+    },
   },
   { timestamps: true }
 );
