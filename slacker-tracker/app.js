@@ -102,7 +102,7 @@ const testFrequency = "5 * * * * *";
 // * means every
 // at second minutes hours date month day-of-week
 //     "*      *      *     *     *       *""
-cron.schedule(testFrequency, () => {
+cron.schedule(calculationFrequency, () => {
   const workerReset = new Worker("./weeklyReport.js");
   workerReset.on("message", () => {
     console.log("Weekly report generation complete!");
