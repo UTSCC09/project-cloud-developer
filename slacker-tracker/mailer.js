@@ -4,7 +4,6 @@ const OAuth2 = google.auth.OAuth2
 const { workerData, parentPort } = require('worker_threads')
 require('dotenv').config()
 
-
 const convertMsToHM = (milliseconds) => {
   let seconds = Math.floor(milliseconds / 1000)
   let minutes = Math.floor(seconds / 60)
@@ -19,50 +18,50 @@ const convertMsToHM = (milliseconds) => {
 }
 
 const createTransporter = async () => {
-    const oauth2Client = new OAuth2(
-      process.env.CLIENT_ID,
-      process.env.CLIENT_SECRET,
-      "https://developers.google.com/oauthplayground"
-    );
-  
-    oauth2Client.setCredentials({
-      refresh_token: process.env.REFRESH_TOKEN
-    });
+  const oauth2Client = new OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    'https://developers.google.com/oauthplayground'
+  )
 
-    const accessToken = await new Promise((resolve, reject) => {
-        oauth2Client.getAccessToken((err, token) => {
-          if (err) {
-            reject("Failed to create access token :(");
-          }
-          resolve(token);
-        });
-    });
+  oauth2Client.setCredentials({
+    refresh_token: process.env.REFRESH_TOKEN
+  })
 
-    const transport = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            type: "OAuth2",
-            accessToken,
-            clientId: process.env.CLIENT_ID,
-            clientSecret: process.env.CLIENT_SECRET,
-            refreshToken: process.env.REFRESH_TOKEN,
-            user: process.env.EMAIL_USERNAME
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
+  const accessToken = await new Promise((resolve, reject) => {
+    oauth2Client.getAccessToken((err, token) => {
+      if (err) {
+        reject('Failed to create access token :(')
+      }
+      resolve(token)
+    })
+  })
 
-    return transport;
-};
+  const transport = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      type: 'OAuth2',
+      accessToken,
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      refreshToken: process.env.REFRESH_TOKEN,
+      user: process.env.EMAIL_USERNAME
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  })
+
+  return transport
+}
 
 const sendEmail = async (emailOptions) => {
-    let emailTransporter = await createTransporter();
-    await emailTransporter.sendMail(emailOptions);
-};
+  const emailTransporter = await createTransporter()
+  await emailTransporter.sendMail(emailOptions)
+}
 
 console.log('workerdata', workerData)
-const sendHTML = 
+const sendHTML =
 `<div>
   <h2>Hello! Here is slacker tracker daily summary of <span style="color:#0d6efd;">${workerData.name}</span>!</h2>
   <br/>
@@ -74,9 +73,9 @@ const sendHTML =
 </div>`
 
 sendEmail({
-    subject: "Slacker Tracker Daily Summary",
-    html: sendHTML,
-    to: workerData.sendEmail
-});
+  subject: 'Slacker Tracker Daily Summary',
+  html: sendHTML,
+  to: workerData.sendEmail
+})
 
 parentPort.postMessage({ workerData })
