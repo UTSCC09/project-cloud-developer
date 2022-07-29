@@ -16,11 +16,15 @@ ButtonAppBar.propTypes = {
 }
 
 export default function ButtonAppBar (props) {
-  const pendingRequests = 0
   const [anchorElUser, setAnchorElUser] = useState(null)
   const [me, setMe] = useState(null)
+
   const navigate = useNavigate()
+
   const socket = io('http://localhost:3001')
+
+  const _id = Cookies.get('_id')
+
   const { setOnlineUsersId } = props
 
   const onLogoutSuccess = () => {
@@ -32,15 +36,12 @@ export default function ButtonAppBar (props) {
     onLogoutSuccess
   })
 
-  const _id = Cookies.get('_id')
-
   useEffect(() => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/user?_id=${_id}`,
+      url: `${CONST.backendURL}/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
-      console.log(res.data.user)
       setMe(res.data.user)
       socket.on('connect', () => {
         console.log('socket connected')
@@ -51,13 +52,11 @@ export default function ButtonAppBar (props) {
       })
       socket.on('updateOnlineUsers', onlineUsersId => {
         setOnlineUsersId(onlineUsersId.onlineUsersId)
-        console.log(onlineUsersId)
       })
     }).catch((err) => {
       console.log(err)
-      // navigate('/signin', { replace: true })
+      navigate('/signin', { replace: true })
     })
-    console.log(me)
   }, [])
 
   const handleOpenUserMenu = (event) => {
@@ -72,13 +71,12 @@ export default function ButtonAppBar (props) {
     signOut()
     axios({
       method: 'GET',
-      url: 'http://localhost:3001/api/user/signout',
+      url: `${CONST.backendURL}/api/user/signout`,
       withCredentials: true
     }).then(res => {
       console.log(res)
-      onLogoutSuccess()
       socket.emit('logout', { _id })
-      window.location.href = './signin'
+      navigate('/signin', { replace: true })
     }).catch(err => {
       console.log(err)
     })
@@ -105,7 +103,7 @@ export default function ButtonAppBar (props) {
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Account">
-            <Badge badgeContent={pendingRequests} color="secondary">
+            <Badge color="secondary">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   { me && <Avatar src={me.avatar}/>}
                   { !me && <Avatar src=''/>}
@@ -128,35 +126,11 @@ export default function ButtonAppBar (props) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={handleCloseUserMenu}>
-                <Typography textAlign="center">Profile</Typography>
-              </MenuItem>
               <MenuItem onClick={logout}>
                 <Typography textAlign="center">Logout</Typography>
               </MenuItem>
             </Menu>
           </Box>
-              {/* <Menu
-                className="menu"
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right'
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right'
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <LoginButton></LoginButton>
-                <LogoutButton></LogoutButton>
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
-              </Menu> */}
         </Toolbar>
       </AppBar>
     </Box>

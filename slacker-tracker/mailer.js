@@ -66,7 +66,7 @@ const sendHTML =
 `<div>
   <h2>Hello! Here is slacker tracker daily summary of <span style="color:#0d6efd;">${workerData.name}</span>!</h2>
   <br/>
-  <h2>Your Slacker Score: <span style="color:#0d6efd;">${workerData.slackerScore}</span><span></h2>
+  <h2>Your Slacker Score: <span style="color:#0d6efd;">${workerData.slackerScore}</span></h2>
   <h3>Total Work Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.workTimeTotal)}</span></h3>
   <h3>Total Game Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.playTimeTotal)}</span></h3>
   <h3>Total Offline Time: <span style="color:#0d6efd;">${convertMsToHM(workerData.offlineTimeTotal)}</span></h3>

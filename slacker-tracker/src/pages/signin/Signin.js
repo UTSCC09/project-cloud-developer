@@ -1,41 +1,34 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import './Signin.css'
 import LoginButton from '../../components/google_oauth2/login'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import Box from '@mui/material/Box'
-import Alert from '@mui/material/Alert'
+import { TextField, Button, Grid, Box, Alert } from '@mui/material'
+import CONST from '../../CONST.js'
 
 function Signin () {
-  const [missingFieldAlert, setMissingFieldAlert] = useState(false)
-  const [serverAlert, setServerAlert] = useState(null)
+  const [alertInfo, setAlertInfo] = React.useState(null)
   const navigate = useNavigate()
   const handleSignin = () => {
-    setMissingFieldAlert(false)
-    setServerAlert(null)
+    setAlertInfo(null)
 
     const email = document.getElementById('signin-email-input').value
     const password = document.getElementById('signin-password-input').value
 
-    if (!email || !password) return setMissingFieldAlert(true)
+    if (!email || !password) return setAlertInfo('Please fill all the fields')
 
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/user/signin',
+      url: `${CONST.backendURL}/api/user/signin`,
       data: {
         password,
         email
       },
       withCredentials: true
     }).then((res) => {
-      console.log(res)
       navigateToHome()
     }).catch((err) => {
-      console.log(err)
-      setServerAlert(err.response.data.message || 'Please type in a valid email address')
+      setAlertInfo((err.response.data && err.response.data.message) || 'Please type in a valid email address')
     })
   }
 
@@ -54,8 +47,7 @@ function Signin () {
                 <Grid item xs={8}>
                     <h2 className='signin-text signin-title'>Welcome Back</h2>
                     <h4 className='signin-text'>We are so excited to see you again!</h4>
-                    {missingFieldAlert ? <Alert severity="error">Please fill all the fields</Alert> : null}
-                    {serverAlert ? <Alert severity="error">{ serverAlert }</Alert> : null}
+                    {alertInfo && <Alert severity="error">{ alertInfo }</Alert>}
                     <TextField fullWidth id="signin-email-input" label="Email" variant="standard" type='email'/>
                     <br/>
                     <TextField fullWidth id="signin-password-input" label="Password" variant="standard" type='password'/>
