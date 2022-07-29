@@ -44,6 +44,12 @@ export default function Bubble (props) {
     console.log(props.onlineUsersId)
   }, [props.onlineUsersId])
 
+  const determineScoreLevel = score => {
+    if (score < 20) return 'score bad'
+    else if (score < 50) return 'score low'
+    else return 'score high'
+  }
+
   return (
     <div className="dashboard">
       {me && (
@@ -58,15 +64,12 @@ export default function Bubble (props) {
             {/* <IconButton alt={me.score} /> */}
           </div>
           <div className="stats">
-            {/* {myTime && myTime.allocatedTime && myTime.allocatedTime.map((duty) => (
-              <div key={duty._id}>{duty.dutyName}: {duty.timer}</div>
-            ))} */}
             <div>Work Time: { timeConvert.convertMsToHM(me.workTimeSpent) }</div>
             <div>Play Time: { timeConvert.convertMsToHM(me.playTimeSpent) }</div>
             <div>Offline Time: { timeConvert.convertMsToHM(me.offlineTimeSpent) }</div>
             <div>Unallocated Time: { timeConvert.convertMsToHM(me.unallocatedTime) }</div>
           </div>
-          <div className="score"><div>{me.slackerScore}</div></div>
+          <div className={determineScoreLevel(me.slackerScore)}><div>{me.slackerScore}</div></div>
         </div>
       )}
       {users && users.map((user, index) => (
@@ -86,16 +89,13 @@ export default function Bubble (props) {
             </div>
             {/* <IconButton alt={user.score} /> */}
             <div className="stats">
-              {/* {users.timersInfo.at(index).allocatedTime.map((duty) => (
-                <div key={duty._id}>{duty.dutyName}: {duty.timer}</div>
-              ))} */}
-              <div>Work Time: { user.workTimeSpent }</div>
-              <div>Play Time: { user.playTimeSpent }</div>
-              <div>Offline Time: { user.offlineTimeSpent }</div>
-              <div>Unallocated Time: { user.unallocatedTime }</div>
+              <div>Work Time: { timeConvert.convertMsToHM(user.workTimeSpent) }</div>
+              <div>Play Time: { timeConvert.convertMsToHM(user.playTimeSpent) }</div>
+              <div>Offline Time: { timeConvert.convertMsToHM(user.offlineTimeSpent) }</div>
+              <div>Unallocated Time: { timeConvert.convertMsToHM(user.unallocatedTimeSpent) }</div>
             </div>
           </div>
-          <div className="score"><div>{user.slackerScore}</div></div>
+          <div className={determineScoreLevel(user.slackerScore)}><div>{user.slackerScore}</div></div>
         </div>
       ))}
     </div>

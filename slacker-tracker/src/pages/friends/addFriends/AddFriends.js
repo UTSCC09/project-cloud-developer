@@ -3,6 +3,7 @@ import axios from 'axios'
 import { TextField, Button, Alert } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
 import Cookies from 'js-cookie'
+import CONST from '../../../CONST.js'
 
 function AddFriends () {
   const [missingFieldAlert, setMissingFieldAlert] = useState(false)
@@ -23,7 +24,7 @@ function AddFriends () {
 
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/user?_id=${_id}`,
+      url: `${CONST.backendURL}/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -31,7 +32,7 @@ function AddFriends () {
       const senderEmail = res.data.user.email
       axios({
         method: 'POST',
-        url: 'http://localhost:3001/api/friendList/sendRequest',
+        url: `${CONST.backendURL}/api/friendList/sendRequest`,
         data: {
           receiverEmail,
           senderEmail
@@ -42,11 +43,11 @@ function AddFriends () {
         setSendSuccess(true)
       }).catch((err) => {
         console.log(err)
-        setServerAlert(err.response.data.message || 'Please type in a valid email')
+        setServerAlert((err.reponse.data && err.response.data.message) || 'Please type in a valid email')
       })
     }).catch((err) => {
       console.log(err)
-      return setServerAlert(err.response.data.message || 'Please type in a valid email')
+      return setServerAlert((err.reponse.data && err.response.data.message) || 'Please type in a valid email')
     })
   }
   return (

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Alert, Paper, Avatar, Grid, Button } from '@mui/material'
 import Cookies from 'js-cookie'
+import CONST from '../../../CONST.js'
 
 function Pending () {
   const [missingCookieAlert, setMissingCookieAlert] = useState(false)
@@ -14,7 +15,7 @@ function Pending () {
 
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/friendList/getRequest?_id=${_id}`,
+      url: `${CONST.backendURL}/api/friendList/getRequest?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       setSenders(res.data.data)
@@ -27,7 +28,7 @@ function Pending () {
   const handleAccept = senderEmail => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/user?_id=${_id}`,
+      url: `${CONST.backendURL}/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -35,7 +36,7 @@ function Pending () {
       const receiverEmail = res.data.user.email
       axios({
         method: 'POST',
-        url: 'http://localhost:3001/api/friendList/acceptRequest',
+        url: `${CONST.backendURL}/api/friendList/acceptRequest`,
         data: {
           receiverEmail,
           senderEmail
@@ -57,7 +58,7 @@ function Pending () {
   const handleCancel = senderEmail => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/user?_id=${_id}`,
+      url: `${CONST.backendURL}/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -65,7 +66,7 @@ function Pending () {
       const receiverEmail = res.data.user.email
       axios({
         method: 'POST',
-        url: 'http://localhost:3001/api/friendList/cancelRequest',
+        url: `${CONST.backendURL}/api/friendList/cancelRequest`,
         data: {
           receiverEmail,
           senderEmail

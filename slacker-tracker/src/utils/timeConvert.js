@@ -1,5 +1,7 @@
 const timeConvert = {
   convertMsToHM: (milliseconds) => {
+    if (milliseconds < 1000) return '00:00'
+
     let seconds = Math.floor(milliseconds / 1000)
     let minutes = Math.floor(seconds / 60)
     let hours = Math.floor(minutes / 60)

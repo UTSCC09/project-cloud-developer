@@ -6,30 +6,39 @@ import Bubble from '../../components/ui/bubble'
 import { Button, Tooltip, Paper } from '@mui/material'
 import WorkIcon from '@mui/icons-material/Work'
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset'
+import CONST from '../../CONST'
+import timeConvert from '../../utils/timeConvert'
 
 function Home () {
   const [timerStarted, setTimerStarted] = React.useState(null)
+  const [startTime, setStartTime] = React.useState(null)
+  const [timeNow, setTimeNow] = React.useState(null)
   const [onlineUsersId, setOnlineUsersId] = React.useState([])
   const _id = Cookies.get('_id')
 
   React.useEffect(() => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/timer/self?_id=${_id}`,
+      url: `${CONST.backendURL}/api/timer/self?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
+      console.log(res)
       if (res.data.data.duty.name !== 'unallocate' && res.data.data.duty.name !== 'offline') {
         setTimerStarted(res.data.data.duty.name)
+        setStartTime(new Date(res.data.data.duty.startTime).getTime())
       }
     }).catch((err) => {
       console.log(err)
     })
+    setTimeNow(new Date().getTime())
+    const interval = setInterval(() => setTimeNow(new Date().getTime()), 1000 * 60)
+    return () => clearInterval(interval)
   }, [])
 
   const handleStartWorkTimer = () => {
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/timer/startTimer',
+      url: `${CONST.backendURL}/api/timer/startTimer`,
       data: {
         _id,
         dutyName: 'work'
@@ -37,6 +46,7 @@ function Home () {
       withCredentials: true
     }).then((res) => {
       setTimerStarted('work')
+      setStartTime(new Date().getTime())
       console.log(res)
     }).catch((err) => {
       console.log(err)
@@ -46,7 +56,7 @@ function Home () {
   const handleStartGameTimer = () => {
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/timer/startTimer',
+      url: `${CONST.backendURL}/api/timer/startTimer`,
       data: {
         _id,
         dutyName: 'play'
@@ -54,6 +64,7 @@ function Home () {
       withCredentials: true
     }).then((res) => {
       setTimerStarted('play')
+      setStartTime(new Date().getTime())
       console.log(res)
     }).catch((err) => {
       console.log(err)
@@ -63,7 +74,7 @@ function Home () {
   const handleStopTimer = () => {
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/timer/stopTimer',
+      url: `${CONST.backendURL}/api/timer/stopTimer`,
       data: {
         _id,
         dutyName: timerStarted
@@ -71,7 +82,6 @@ function Home () {
       withCredentials: true
     }).then((res) => {
       setTimerStarted(null)
-      console.log(res)
     }).catch((err) => {
       console.log(err)
     })
@@ -103,7 +113,7 @@ function Home () {
         timerStarted &&
         <Paper sx={{ position: 'fixed', right: 20, bottom: 20 }}>
           <Button variant="contained" color='error' onClick={handleStopTimer}>
-              Stop {timerStarted !== 'play' ? timerStarted : 'game'} Timer
+            Stop {timerStarted !== 'play' ? timerStarted : 'game'} Timer({timeConvert.convertMsToHM(timeNow - startTime)})
           </Button>
         </Paper>
       }
