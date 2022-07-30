@@ -65,7 +65,7 @@ export default function Bubble (props) {
             {/* <IconButton alt={me.score} /> */}
           </div>
           <div className="stats">
-            <Bar></Bar>
+            <Bar workTime={2400} playTime={299} offlineTime={100} unallocatedTime={38} ></Bar>
             <div>Work Time: { timeConvert.convertMsToHM(me.workTimeSpent) }</div>
             <div>Play Time: { timeConvert.convertMsToHM(me.playTimeSpent) }</div>
             <div>Offline Time: { timeConvert.convertMsToHM(me.offlineTimeSpent) }</div>
