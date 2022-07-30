@@ -4,6 +4,7 @@ import { Avatar } from '@mui/material'
 import Cookies from 'js-cookie'
 import timeConvert from '../../utils/timeConvert'
 import PropTypes from 'prop-types'
+import Bar from './bar'
 
 Bubble.propTypes = {
   onlineUsersId: PropTypes.any
@@ -64,6 +65,7 @@ export default function Bubble (props) {
             {/* <IconButton alt={me.score} /> */}
           </div>
           <div className="stats">
+            <Bar></Bar>
             <div>Work Time: { timeConvert.convertMsToHM(me.workTimeSpent) }</div>
             <div>Play Time: { timeConvert.convertMsToHM(me.playTimeSpent) }</div>
             <div>Offline Time: { timeConvert.convertMsToHM(me.offlineTimeSpent) }</div>
@@ -98,6 +100,7 @@ export default function Bubble (props) {
           <div className={determineScoreLevel(user.slackerScore)}><div>{user.slackerScore}</div></div>
         </div>
       ))}
+
     </div>
   )
 }
