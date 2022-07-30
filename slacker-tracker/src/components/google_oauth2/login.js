@@ -22,7 +22,7 @@ export default function Login () {
       url: 'http://localhost:3001/api/user/oauth2/google',
       data: {
         googleId: res.profileObj.googleId,
-        username: res.profileObj.name,
+        name: res.profileObj.name,
         email: res.profileObj.email,
         avatar: res.profileObj.imageUrl || null,
         access_token: res.tokenObj.access_token

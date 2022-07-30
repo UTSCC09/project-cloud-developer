@@ -4,6 +4,7 @@ import { Avatar } from '@mui/material'
 import Cookies from 'js-cookie'
 import timeConvert from '../../utils/timeConvert'
 import PropTypes from 'prop-types'
+import CONST from '../../CONST'
 
 Bubble.propTypes = {
   onlineUsersId: PropTypes.any
@@ -19,7 +20,7 @@ export default function Bubble (props) {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/timer/self?_id=${_id}`,
+      url: `${CONST.backendURL}/api/timer/self?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -29,7 +30,7 @@ export default function Bubble (props) {
     })
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/timer/friends?_id=${_id}`,
+      url: `${CONST.backendURL}/api/timer/friends?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
