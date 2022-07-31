@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const { Worker } = require("worker_threads");
-const { UserModel, TimerModel } = require("./db");
+const { UserModel, FriendListModel, TimerModel } = require("./db");
 const cron = require("node-cron");
 
 const bodyParser = require("body-parser");
@@ -59,10 +59,28 @@ app.get("/api/generateSummaryEmail", (req, res, next) => {
     workerData.offlineTimeTotal = user.lastWeekReport.offlineTimeTotal;
     workerData.slackerScore = user.slackerScore;
     workerData.sendEmail = req.query.sendEmail;
-    console.log("data", workerData);
-    const worker = new Worker("./mailer.js", { workerData });
-    worker.on("message", () => res.status(200).json({ message: "success" }));
-    worker.on("error", () => res.status(500).json({ message: "fail" }));
+
+    FriendListModel.findOne(
+      { _id: req.query._id },
+      "friendList",
+      (err, user) => {
+        if (err) return res.status(500).json({ message: err });
+        UserModel.find({}, "_id slackerScore", (err, users) => {
+          if (err) return res.status(500).json({ message: err });
+          const friendScores = users
+            .filter((person) => user.friendList.includes(person._id))
+            .map((person) => person.slackerScore);
+
+          workerData.friendScores = friendScores;
+          console.log("data", workerData);
+          const worker = new Worker("./mailer.js", { workerData });
+          worker.on("message", () =>
+            res.status(200).json({ message: "success" })
+          );
+          worker.on("error", () => res.status(500).json({ message: "fail" }));
+        });
+      }
+    );
   });
 });
 
