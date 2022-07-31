@@ -51,6 +51,17 @@ app.get("/api/generateSummaryEmail", (req, res, next) => {
       .json({ message: "missing sendEmail in request query" });
   UserModel.findOne({ _id: req.query._id }, (err, user) => {
     if (err) return res.status(500).json({ message: err });
+    const now = new Date();
+    const createdAt = new Date(user.createdAt);
+    const nowDay = now.getDay() === 0 ? 7 : now.getDay();
+    const createdAtDay = createdAt.getDay() === 0 ? 7 : createdAt.getDay();
+    if (
+      now.getTime() - createdAt.getTime() < 1000 * 60 * 60 * 24 * 7 &&
+      nowDay > createdAtDay
+    )
+      return res
+        .status(400)
+        .json({ message: "This account is registerd in this week" });
     let workerData = {};
     workerData.name = user.name;
     workerData.workTimeTotal = user.lastWeekReport.workTimeTotal;
