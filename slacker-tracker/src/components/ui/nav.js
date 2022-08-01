@@ -12,7 +12,7 @@ import { io } from 'socket.io-client'
 import PropTypes from 'prop-types'
 
 ButtonAppBar.propTypes = {
-  setOnlineUsersId: PropTypes.any
+  setOnlineUsersId: PropTypes.func
 }
 
 export default function ButtonAppBar (props) {
