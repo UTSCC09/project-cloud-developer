@@ -95,10 +95,12 @@ export default function Bubble (props) {
             {/* <IconButton alt={user.score} /> */}
             <div className="stats">
               <Bar workTime={ user.workTimeSpent / CONST.milsecPerMin } playTime={ user.playTimeSpent / CONST.milsecPerMin } offlineTime={ user.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ user.unallocatedTime / CONST.milsecPerMin } ></Bar>
-              <div>Work:{ timeConvert.convertMsToHM(user.workTimeSpent) }</div>
-              <div>Play:{ timeConvert.convertMsToHM(user.playTimeSpent) }</div>
-              <div>Offline:{ timeConvert.convertMsToHM(user.offlineTimeSpent) }</div>
-              <div>Unallocated:{ timeConvert.convertMsToHM(user.unallocatedTimeSpent) }</div>
+              <div className="details">
+                <div><div>Work:</div><div>{ timeConvert.convertMsToHM(user.workTimeSpent) } hrs</div></div>
+                <div><div>Play:</div><div>{ timeConvert.convertMsToHM(user.playTimeSpent) } hrs</div></div>
+                <div><div>Offline:</div><div>{ timeConvert.convertMsToHM(user.offlineTimeSpent) } hrs</div></div>
+                <div><div>Unallocated:</div><div>{ timeConvert.convertMsToHM(user.unallocatedTime) } hrs</div></div>
+              </div>
             </div>
           </div>
           <div className={determineScoreLevel(user.slackerScore)}><div>{user.slackerScore}</div></div>

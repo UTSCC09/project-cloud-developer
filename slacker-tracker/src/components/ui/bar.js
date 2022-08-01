@@ -93,11 +93,13 @@ export default function Bar (props) {
   }
 
   // const shift = 4
+
   return (
     // <Canvas camera={{ fov: 75, position: [0, 0, 30] }}>
     <Canvas>
       <ambientLight intensity={0.1} />
       <spotLight intensity={0.6} position={[-7, 7, 7]} angle={0.5} penumbra={1} />
+      {/* <spotLight intensity={6} position={[-5.5, 0, 1]} angle={180} penumbra={0.5} /> */}
       <pointLight intensity={0.1} position={[-7, 7, 7]} />
       <Box position={[-5.5, -3.2 + props.workTime / (600 * 2), 0]} height={props.workTime / 600} color={color(props.workTime, 'work')} lightColor={color(props.workTime + 200, 'work')}/>
       <Box position={[-1.9, -3.2 + props.playTime / (510 * 2), 0]} height={props.playTime / 510} color={color(props.playTime, 'play')} lightColor={color(props.playTime + 100, 'play')}/>
