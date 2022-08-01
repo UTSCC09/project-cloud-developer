@@ -12,7 +12,7 @@ import { io } from 'socket.io-client'
 import PropTypes from 'prop-types'
 
 ButtonAppBar.propTypes = {
-  setOnlineUsersId: PropTypes.any
+  setOnlineUsersId: PropTypes.func
 }
 
 export default function ButtonAppBar (props) {
@@ -21,7 +21,7 @@ export default function ButtonAppBar (props) {
 
   const navigate = useNavigate()
 
-  const socket = io('http://localhost:3001')
+  const socket = io(CONST.backendURL)
 
   const _id = Cookies.get('_id')
 
@@ -51,6 +51,7 @@ export default function ButtonAppBar (props) {
         console.log(`connect_error due to ${err.message}`)
       })
       socket.on('updateOnlineUsers', onlineUsersId => {
+        if (!setOnlineUsersId) return
         setOnlineUsersId(onlineUsersId.onlineUsersId)
       })
     }).catch((err) => {
