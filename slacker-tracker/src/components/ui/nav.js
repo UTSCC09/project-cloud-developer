@@ -51,6 +51,7 @@ export default function ButtonAppBar (props) {
         console.log(`connect_error due to ${err.message}`)
       })
       socket.on('updateOnlineUsers', onlineUsersId => {
+        if (!setOnlineUsersId) return
         setOnlineUsersId(onlineUsersId.onlineUsersId)
       })
     }).catch((err) => {

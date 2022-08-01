@@ -33,28 +33,9 @@ function Home () {
     })
     setTimeNow(new Date().getTime())
     const interval = setInterval(() => setTimeNow(new Date().getTime()), 1000 * 60)
-    setInterval(() => refreshBubbles(), 3000)
+    // setInterval(() => refreshBubbles(), 3000)
     return () => clearInterval(interval)
   }, [])
-
-  const handleStartWorkTimer = () => {
-    axios({
-      method: 'POST',
-      url: `${CONST.backendURL}/api/timer/startTimer`,
-      data: {
-        _id,
-        dutyName: 'work'
-      },
-      withCredentials: true
-    }).then((res) => {
-      setTimerStarted('work')
-      setStartTime(new Date().getTime())
-      refreshBubbles()
-      console.log(res)
-    }).catch((err) => {
-      console.log(err)
-    })
-  }
 
   const [users, setUsers] = useState(null)
   const [me, setMe] = useState(null)
@@ -77,6 +58,25 @@ function Home () {
     }).then((res) => {
       console.log(res)
       setUsers(res.data.data)
+    }).catch((err) => {
+      console.log(err)
+    })
+  }
+
+  const handleStartWorkTimer = () => {
+    axios({
+      method: 'POST',
+      url: `${CONST.backendURL}/api/timer/startTimer`,
+      data: {
+        _id,
+        dutyName: 'work'
+      },
+      withCredentials: true
+    }).then((res) => {
+      setTimerStarted('work')
+      setStartTime(new Date().getTime())
+      refreshBubbles()
+      console.log(res)
     }).catch((err) => {
       console.log(err)
     })

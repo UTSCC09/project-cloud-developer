@@ -6,6 +6,8 @@
 
 ### Project Description
 
+Demo link: https://youtu.be/DciH1enb584
+
 ### *slacker-tracker*
 
 *It will never leave you lacking... if you be slacking, it be tracking... so get hacking!*
@@ -25,9 +27,9 @@ If at the end of the week you have spent an acceptable amount of time doing each
 
 * Oauth: email confirmation and Google sign in.
 * Secure interactions with docker container and restrict viewing of user information to friends only.
-* Scalability.
 * Non-trivial frontend: animate 3D graph bars and slacker-tracker score metallic badge.
 * Real-time interactions: current status, current running timer (live updates to 3D graph, and indication and duration of currently running timer) and record the time when user closes/open app or the app is no longer active.
+* Service workers: send email of user's information and automatically update slacker score every Monday. 
 
 ### Beta version
 
