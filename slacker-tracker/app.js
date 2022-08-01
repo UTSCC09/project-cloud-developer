@@ -38,7 +38,7 @@ app.use(function (req, res, next) {
   // }))
   // req.email = req.session.email ? req.session.email : null
   // console.log('app use: ', req.session)
-  console.log("HTTPS request", req.method, req.url, req.body);
+  console.log("HTTP request", req.method, req.url, req.body);
   next();
 });
 
@@ -49,21 +49,26 @@ app.get("/api/generateSummaryEmail", (req, res, next) => {
     return res
       .status(400)
       .json({ message: "missing sendEmail in request query" });
-  UserModel.findOne({ _id: req.query._id }, (err, user) => {
-    if (err) return res.status(500).json({ message: err });
-    let workerData = {};
-    workerData.name = user.name;
-    workerData.workTimeTotal = user.lastWeekReport.workTimeTotal;
-    workerData.playTimeTotal = user.lastWeekReport.playTimeTotal;
-    workerData.unallocatedTimeTotal = user.lastWeekReport.unallocatedTimeTotal;
-    workerData.offlineTimeTotal = user.lastWeekReport.offlineTimeTotal;
-    workerData.slackerScore = user.slackerScore;
-    workerData.sendEmail = req.query.sendEmail;
-    console.log("data", workerData);
-    const worker = new Worker("./mailer.js", { workerData });
-    worker.on("message", () => res.status(200).json({ message: "success" }));
-    worker.on("error", () => res.status(500).json({ message: "fail" }));
-  });
+  UserModel.findOne(
+    { _id: req.query._id },
+    (err, user) => {
+      if (err) return res.status(500).json({ message: err });
+      let workerData = {}
+      workerData.name = user.name;
+      workerData.workTimeTotal = user.lastWeekReport.workTimeTotal;
+      workerData.playTimeTotal = user.lastWeekReport.playTimeTotal;
+      workerData.unallocatedTimeTotal = user.lastWeekReport.unallocatedTimeTotal;
+      workerData.offlineTimeTotal = user.lastWeekReport.offlineTimeTotal;
+      workerData.slackerScore = user.slackerScore;
+      workerData.sendEmail = req.query.sendEmail;
+      console.log('data', workerData)
+      const worker = new Worker("./mailer.js", { workerData });
+      worker.on("message", () =>
+        res.status(200).json({ message: "success" })
+      );
+      worker.on("error", () => res.status(500).json({ message: "fail" }));
+    }
+  );
 });
 
 const users = require("./routes/users");
@@ -94,29 +99,13 @@ cron.schedule(calculationFrequency, () => {
   workerReset.on("error", () => console.log("Weekly report generation fail!!"));
 });
 
-// const http = require("http");
+const http = require("http");
 const { getByTestId } = require("@testing-library/react");
 
-const https = require("https");
-const fs = require("fs");
-const PORT = 3000;
-
-var privateKey = fs.readFileSync("server.key");
-var certificate = fs.readFileSync("server.crt");
-var config = {
-  key: privateKey,
-  cert: certificate,
-};
-
-const server = https.createServer(config, app).listen(PORT, function (err) {
+const server = http.createServer(app).listen(port, function (err) {
   if (err) console.log(err);
-  else console.log("HTTPS server on https://localhost:%s", PORT);
+  else console.log("HTTP server on http://localhost:%s", port);
 });
-
-// const server = http.createServer(app).listen(port, function (err) {
-//   if (err) console.log(err);
-//   else console.log("HTTP server on http://localhost:%s", port);
-// });
 
 const io = require("socket.io")(server, {
   cors: {
