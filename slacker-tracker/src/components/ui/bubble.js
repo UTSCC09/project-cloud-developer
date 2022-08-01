@@ -99,7 +99,7 @@ export default function Bubble (props) {
                 <div><div>Work:</div><div>{ timeConvert.convertMsToHM(user.workTimeSpent) } hrs</div></div>
                 <div><div>Play:</div><div>{ timeConvert.convertMsToHM(user.playTimeSpent) } hrs</div></div>
                 <div><div>Offline:</div><div>{ timeConvert.convertMsToHM(user.offlineTimeSpent) } hrs</div></div>
-                <div><div>Unallocated:</div><div>{ timeConvert.convertMsToHM(user.unallocatedTime) } hrs</div></div>
+                <div><div>Unallocated:</div><div>{ timeConvert.convertMsToHM(user.unallocatedTimeSpent) } hrs</div></div>
               </div>
             </div>
           </div>
