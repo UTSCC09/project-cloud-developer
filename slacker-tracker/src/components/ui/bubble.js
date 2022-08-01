@@ -5,6 +5,8 @@ import PropTypes from 'prop-types'
 import Bar from './bar'
 import CONST from '../../CONST'
 import './bubble.css'
+import Cookies from 'js-cookie'
+import axios from 'axios'
 
 Bubble.propTypes = {
   onlineUsersId: PropTypes.any,
