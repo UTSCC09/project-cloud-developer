@@ -3,7 +3,8 @@ const CONST = {
   colors: {
     green: '#38d86c'
   },
-  backendURL: 'http://localhost:3001'
+  backendURL: 'http://localhost:3001',
+  milsecPerMin: 1000 * 60
 }
 
 export default CONST
