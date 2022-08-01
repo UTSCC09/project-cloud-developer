@@ -14,6 +14,13 @@ Many of us (especially computer science students) suffer from spending too much 
 
 If at the end of the week you have spent an acceptable amount of time doing each of these things, your *slacker tracker* score will increase, if not, it will decrease. In this way you have accountability with the friends in your group who can see how well (or not) you are doing this week, and how high or low your *slacker tracker* score is (how well users have been managing their time in general). So friends can help each other stay on track and live happier, healthier, and more balanced lives!
 
+**Optimal Ranges per week**
+
+- 30 <= work <= 60
+- 3 <= game <= 20
+- 90 <= offline <= 120
+- unallocated_optimal <= 1
+
 ### Challenge Factor
 
 * Oauth: email confirmation and Google sign in.
