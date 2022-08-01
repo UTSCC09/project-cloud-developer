@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const { Worker } = require("worker_threads");
-const { UserModel, TimerModel } = require("./db");
+const { UserModel, FriendListModel, TimerModel } = require("./db");
 const cron = require("node-cron");
 
 const bodyParser = require("body-parser");
@@ -49,26 +49,50 @@ app.get("/api/generateSummaryEmail", (req, res, next) => {
     return res
       .status(400)
       .json({ message: "missing sendEmail in request query" });
-  UserModel.findOne(
-    { _id: req.query._id },
-    (err, user) => {
-      if (err) return res.status(500).json({ message: err });
-      let workerData = {}
-      workerData.name = user.name;
-      workerData.workTimeTotal = user.lastWeekReport.workTimeTotal;
-      workerData.playTimeTotal = user.lastWeekReport.playTimeTotal;
-      workerData.unallocatedTimeTotal = user.lastWeekReport.unallocatedTimeTotal;
-      workerData.offlineTimeTotal = user.lastWeekReport.offlineTimeTotal;
-      workerData.slackerScore = user.slackerScore;
-      workerData.sendEmail = req.query.sendEmail;
-      console.log('data', workerData)
-      const worker = new Worker("./mailer.js", { workerData });
-      worker.on("message", () =>
-        res.status(200).json({ message: "success" })
-      );
-      worker.on("error", () => res.status(500).json({ message: "fail" }));
-    }
-  );
+  UserModel.findOne({ _id: req.query._id }, (err, user) => {
+    if (err) return res.status(500).json({ message: err });
+    const now = new Date();
+    const createdAt = new Date(user.createdAt);
+    const nowDay = now.getDay() === 0 ? 7 : now.getDay();
+    const createdAtDay = createdAt.getDay() === 0 ? 7 : createdAt.getDay();
+    if (
+      now.getTime() - createdAt.getTime() < 1000 * 60 * 60 * 24 * 7 &&
+      nowDay > createdAtDay
+    )
+      return res
+        .status(400)
+        .json({ message: "This account is registerd in this week" });
+    let workerData = {};
+    workerData.name = user.name;
+    workerData.workTimeTotal = user.lastWeekReport.workTimeTotal;
+    workerData.playTimeTotal = user.lastWeekReport.playTimeTotal;
+    workerData.unallocatedTimeTotal = user.lastWeekReport.unallocatedTimeTotal;
+    workerData.offlineTimeTotal = user.lastWeekReport.offlineTimeTotal;
+    workerData.slackerScore = user.slackerScore;
+    workerData.sendEmail = req.query.sendEmail;
+
+    FriendListModel.findOne(
+      { _id: req.query._id },
+      "friendList",
+      (err, user) => {
+        if (err) return res.status(500).json({ message: err });
+        UserModel.find({}, "_id slackerScore", (err, users) => {
+          if (err) return res.status(500).json({ message: err });
+          const friendScores = users
+            .filter((person) => user.friendList.includes(person._id))
+            .map((person) => person.slackerScore);
+
+          workerData.friendScores = friendScores;
+          console.log("data", workerData);
+          const worker = new Worker("./mailer.js", { workerData });
+          worker.on("message", () =>
+            res.status(200).json({ message: "success" })
+          );
+          worker.on("error", () => res.status(500).json({ message: "fail" }));
+        });
+      }
+    );
+  });
 });
 
 const users = require("./routes/users");
