@@ -68,7 +68,7 @@ export default function Bubble (props) {
           <div className="stats">
             <Bar workTime={ me.workTimeSpent / CONST.milsecPerMin } playTime={ me.playTimeSpent / CONST.milsecPerMin } offlineTime={ me.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ me.unallocatedTime / CONST.milsecPerMin } ></Bar>
             <div className="details">
-              <div><div>Work:</div><div>{ timeConvert.convertMsToHM(me.workTimeSpent) } hrs</div></div>
+              <div className="glow"><div>Work:</div><div>{ timeConvert.convertMsToHM(me.workTimeSpent) } hrs</div></div>
               <div><div>Play:</div><div>{ timeConvert.convertMsToHM(me.playTimeSpent) } hrs</div></div>
               <div><div>Offline:</div><div>{ timeConvert.convertMsToHM(me.offlineTimeSpent) } hrs</div></div>
               <div><div>Unallocated:</div><div>{ timeConvert.convertMsToHM(me.unallocatedTime) } hrs</div></div>

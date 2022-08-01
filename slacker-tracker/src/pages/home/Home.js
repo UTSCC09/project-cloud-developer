@@ -104,7 +104,7 @@ function Home () {
           <Tooltip title="Start Game Timer">
             <Button variant="extended" onClick={handleStartGameTimer}>
               <VideogameAssetIcon sx={{ mr: 1 }} />
-                Game
+                Play
             </Button>
           </Tooltip>
         </Paper>
