@@ -21,7 +21,7 @@ export default function ButtonAppBar (props) {
 
   const navigate = useNavigate()
 
-  const socket = io('http://localhost:3001')
+  const socket = io(CONST.backendURL)
 
   const _id = Cookies.get('_id')
 

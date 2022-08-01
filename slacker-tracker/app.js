@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 const cors = require('cors')
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL || 'http://localhost:3000' }))
 
 const session = require('express-session')
 app.use(
@@ -134,7 +134,7 @@ const server = http.createServer(app).listen(port, function (err) {
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     methods: ['GET', 'POST']
   }
 })

@@ -33,8 +33,11 @@ function Home () {
     })
     setTimeNow(new Date().getTime())
     const interval = setInterval(() => setTimeNow(new Date().getTime()), 1000 * 60)
-    // setInterval(() => refreshBubbles(), 3000)
-    return () => clearInterval(interval)
+    const interval2 = setInterval(() => refreshBubbles(), 30000)
+    return () => {
+      clearInterval(interval)
+      clearInterval(interval2)
+    }
   }, [])
 
   const [users, setUsers] = useState(null)
@@ -43,7 +46,7 @@ function Home () {
   const refreshBubbles = () => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/timer/self?_id=${_id}`,
+      url: `${CONST.backendURL}/api/timer/self?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -53,7 +56,7 @@ function Home () {
     })
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/timer/friends?_id=${_id}`,
+      url: `${CONST.backendURL}/api/timer/friends?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
