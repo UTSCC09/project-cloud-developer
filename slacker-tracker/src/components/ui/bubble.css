@@ -1,0 +1,24 @@
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.4em;
+  padding: 0.5em 1em;
+  justify-content: center;
+}
+
+.stats .details {
+  display: flex;
+  flex-direction: row;
+  /* padding: 0 3em; */
+  justify-content: center;
+}
+
+.stats .details > div {
+  display: flex;
+  width: 4.5em;
+  flex-direction: column;
+  padding: 0.1em 0.6em;
+  align-items: center;
+  font-size: 0.8em;
+}

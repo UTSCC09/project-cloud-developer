@@ -156,13 +156,6 @@ a {
   /* transform: scale(1.5); */
   background-color: transparent;
 }
-.stats {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.4em;
-  padding: 0.5em 1em;
-  justify-content: center;
-}
 
 .name {
   display: flex;
