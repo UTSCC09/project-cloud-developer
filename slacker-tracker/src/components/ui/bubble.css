@@ -18,7 +18,8 @@
   display: flex;
   width: 61px;
   flex-direction: column;
-  padding: 0.1em 0.6em;
+  padding: 2px;
+  margin: 0 4px;
   align-items: center;
   font-size: 0.6em;
   border-radius: 0.5em;
