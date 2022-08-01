@@ -74,7 +74,7 @@ export default function Bubble (props) {
             </div>
             {/* <IconButton alt={user.score} /> */}
             <div className="stats">
-              <Bar workTime={ user.workTimeSpent / CONST.milsecPerMin } playTime={ user.playTimeSpent / CONST.milsecPerMin } offlineTime={ user.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ user.unallocatedTime / CONST.milsecPerMin } ></Bar>
+              <Bar workTime={ user.workTimeSpent / CONST.milsecPerMin } playTime={ user.playTimeSpent / CONST.milsecPerMin } offlineTime={ user.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ user.unallocatedTimeSpent / CONST.milsecPerMin } ></Bar>
               <div className="details">
                 <div className={user.duty.name === 'work' ? 'glow' : ''}><div>Work:</div><div>{ timeConvert.convertMsToHM(user.workTimeSpent) } hrs</div></div>
                 <div className={user.duty.name === 'play' ? 'glow' : ''}><div>Play:</div><div>{ timeConvert.convertMsToHM(user.playTimeSpent) } hrs</div></div>

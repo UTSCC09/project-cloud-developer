@@ -22,7 +22,7 @@ export default function Login () {
       url: 'http://localhost:3001/api/user/oauth2/google',
       data: {
         googleId: res.profileObj.googleId,
-        username: res.profileObj.name,
+        name: res.profileObj.name,
         email: res.profileObj.email,
         avatar: res.profileObj.imageUrl || null,
         access_token: res.tokenObj.access_token
@@ -31,7 +31,6 @@ export default function Login () {
     })
       .then((res) => {
         console.log(res)
-        document.cookie = `email=${res.data.user.email}`
         window.location.href = './home'
       })
       .catch((err) => {
