@@ -82,7 +82,7 @@ function Home () {
     })
   }
 
-  const handleStartGameTimer = () => {
+  const handleStartPlayTimer = () => {
     axios({
       method: 'POST',
       url: `${CONST.backendURL}/api/timer/startTimer`,
@@ -132,8 +132,8 @@ function Home () {
                 Work
             </Button>
           </Tooltip>
-          <Tooltip title="Start Game Timer">
-            <Button variant="extended" onClick={handleStartGameTimer}>
+          <Tooltip title="Start Play Timer">
+            <Button variant="extended" onClick={handleStartPlayTimer}>
               <VideogameAssetIcon sx={{ mr: 1 }} />
                 Play
             </Button>
