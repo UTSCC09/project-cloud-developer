@@ -6,7 +6,7 @@
 
 ### Project Description
 
-Demo link: https://youtu.be/DciH1enb584
+Demo link: https://youtu.be/qPEEWPazE-k
 
 ### *slacker-tracker*
 
@@ -26,10 +26,10 @@ If at the end of the week you have spent an acceptable amount of time doing each
 ### Challenge Factor
 
 * Oauth: email confirmation and Google sign in.
-* Secure interactions with docker container and restrict viewing of user information to friends only.
-* Non-trivial frontend: animate 3D graph bars and slacker-tracker score metallic badge.
-* Real-time interactions: current status, current running timer (live updates to 3D graph, and indication and duration of currently running timer) and record the time when user closes/open app or the app is no longer active.
-* Service workers: send email of user's information and automatically update slacker score every Monday. 
+* Non-trivial frontend: 3D bar graphs with gradient color calculated based on the optimal ranges for each category.
+* Websocket, Real-time interactions: current status, current running timer and record the time when user closes/open app or the app is no longer active.
+* Service workers: send email of user's information and automatically update slacker score every Monday.
+* Nginx as proxy server.
 
 ### Beta version
 
@@ -40,11 +40,9 @@ If at the end of the week you have spent an acceptable amount of time doing each
 
 ### Final version
 
-* Add user details: name, avatar, bio, and slacker-tracker score.
-* Seeing friends 3D weekly bar graph of their time allocation summary and 3D slacker-tracker score badge.
+* Add user details: name and slacker-tracker score.
+* Seeing friends 3D weekly bar graph of their time allocation summary.
 * Offline time is calculated when the app is not open i.e. not on your computer, and unallocated time when you are running any timer.
-* Getting system notification if user is not tracking their time.
-* Send encouraging notification to friends.
 
 ### Technology Stack
 

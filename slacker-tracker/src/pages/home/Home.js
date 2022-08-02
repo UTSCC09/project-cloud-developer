@@ -33,7 +33,7 @@ function Home () {
     })
     setTimeNow(new Date().getTime())
     const interval = setInterval(() => setTimeNow(new Date().getTime()), 1000 * 60)
-    const interval2 = setInterval(() => refreshBubbles(), 30000)
+    const interval2 = setInterval(() => refreshBubbles(), 3000)
     return () => {
       clearInterval(interval)
       clearInterval(interval2)
