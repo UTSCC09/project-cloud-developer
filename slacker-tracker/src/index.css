@@ -52,6 +52,13 @@
   background-color: rgba(131, 131, 131, 0.199);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg_color: rgb(212, 212, 221);
+    --bg_color_dark: rgb(225, 225, 232);
+    --fg_color: rgb(50, 54, 57);
+  }
+}
 
 body {
   margin: 0;
@@ -76,7 +83,7 @@ a {
   cursor: pointer;
 }
 
-.nav {
+.nav, header {
   text-align: left;
   /* top: 0;
   left: 0;
@@ -84,13 +91,13 @@ a {
   /* height: var(--nav-size); */
   /* position: absolute; */
   /* color: var(--fg_color); */
-  box-shadow: var(--nav_shadow);
+  box-shadow: var(--nav_shadow)!important;
   /* overflow-y: hidden; */
   /* font-size: var(--nav-font); */
   /* text-align: center;
   vertical-align: middle; */
   backdrop-filter: blur(23px);
-  background-color: transparent;
+  background-color: #2169de61!important;
 }
 
 .board {
@@ -146,9 +153,6 @@ a {
   display: flex;
   /* align-items: flex-end; */
 }
-.avatar {
-  margin-right: 0.5em;
-}
 .me {
   box-shadow: none;
   padding: 0.5em;
@@ -201,26 +205,31 @@ a {
   background-color: var(--button-color);
 }
 
-.offline-status-circle {
+.avatar {
+  margin-right: -12px;
+  z-index: 0;
+  width: 20px;
+  height: 20px;
+}
+.status-circle {
   width: 15px;
   height: 15px;
   border-radius: 50%;
+  z-index: 1;
+  margin-top: 20px;
+  margin-right: 5px;
+  /* bottom: 0.6em; */
+  /* right: 0; */
+  /* position: absolute; */
+  align-items: flex-start;
+}
+.offline.status-circle {
   background-color: grey;
   border: 2px solid white;
-  bottom: 0.6em;
-  right: 0;
-  position: absolute;
 }
-
-.online-status-circle {
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
+.online.status-circle {
   background-color: rgb(26, 196, 26);
   border: 2px solid white;
-  bottom: 0.6em;
-  right: 0;
-  position: absolute;
 }
 
 .status-container {
