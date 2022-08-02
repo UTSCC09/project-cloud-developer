@@ -14,14 +14,52 @@
   justify-content: center;
 }
 
+.me .graph {
+  --legend: 60px;
+  --legend-pd: 2px;
+  --legend-mg: 4px;
+  --graph-width: calc(var(--legend) * 4 + var(--legend-pd) * 8 + var(--legend-mg) * 8);
+  --graph-height: 100%;
+  position: relative;
+  width: var(--graph-width);
+  height: var(--graph-height);
+}
+
+.me .stats .details > div {
+  --legend: 60px;
+  --legend-pd: 2px;
+  --legend-mg: 4px;
+  width: var(--legend);
+  padding: var(--legend-pd);
+  margin: 0 var(--legend-mg);
+  font-size: 0.6em;
+}
+
+.graph {
+  --legend: 50px;
+  --legend-pd: 1px;
+  --legend-mg: 3px;
+  --graph-width: calc(var(--legend) * 4 + var(--legend-pd) * 8 + var(--legend-mg) * 8);
+  --graph-height: 84.5%;
+  position: relative;
+  width: var(--graph-width);
+  height: var(--graph-height);
+}
+
+.stats .details > div {
+  --legend: 50px;
+  --legend-pd: 1px;
+  --legend-mg: 3px;
+  width: var(--legend);
+  padding: var(--legend-pd);
+  margin: 0 var(--legend-mg);
+  font-size: 0.8em;
+}
+
 .stats .details > div {
   display: flex;
-  width: 61px;
   flex-direction: column;
-  padding: 2px;
-  margin: 0 4px;
   align-items: center;
-  font-size: 0.6em;
   border-radius: 0.5em;
   background-color: transparent;
 }

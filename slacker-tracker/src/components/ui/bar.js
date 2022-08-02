@@ -9,6 +9,10 @@ Box.propTypes = {
 }
 
 function Box (props) {
+  // const { setSize } = useThree()
+  // setSize(300, 300)
+  // console.log(size)
+
   // This reference gives us direct access to the THREE.Mesh object
   const ref = useRef()
   // Hold state for hovered and clicked events
@@ -97,15 +101,17 @@ export default function Bar (props) {
 
   return (
     // <Canvas camera={{ fov: 75, position: [0, 0, 30] }}>
-    <Canvas>
-      <ambientLight intensity={0.1} />
-      <spotLight intensity={0.6} position={[-7, 7, 7]} angle={0.5} penumbra={1} />
-      {/* <spotLight intensity={6} position={[-5.5, 0, 1]} angle={180} penumbra={0.5} /> */}
-      <pointLight intensity={0.1} position={[-7, 7, 7]} />
-      <Box position={[-5.5, -3.2 + props.workTime / (600 * 2), 0]} height={props.workTime / 600 + zero} color={color(props.workTime, 'work')} lightColor={color(props.workTime + 200, 'work')}/>
-      <Box position={[-1.9, -3.2 + props.playTime / (510 * 2), 0]} height={props.playTime / 510 + zero} color={color(props.playTime, 'play')} lightColor={color(props.playTime + 100, 'play')}/>
-      <Box position={[1.7, -3.2 + props.offlineTime / (600 * 2), 0]} height={props.offlineTime / 600 + zero} color={color(props.offlineTime, 'offline')} lightColor={color(props.offlineTime + 200, 'offline')}/>
-      <Box position={[5.3, -3.2 + props.unallocatedTime / (30 * 2), 0]} height={props.unallocatedTime / 30 + zero} color={color(props.unallocatedTime, 'unallocated')} lightColor={color(props.unallocatedTime + 10, 'unallocated')}/>
-    </Canvas>
+    <div className='graph'>
+      <Canvas>
+        <ambientLight intensity={0.1} />
+        <spotLight intensity={0.6} position={[-7, 7, 7]} angle={0.5} penumbra={1} />
+        {/* <spotLight intensity={6} position={[-5.5, 0, 1]} angle={180} penumbra={0.5} /> */}
+        <pointLight intensity={0.1} position={[-7, 7, 7]} />
+        <Box position={[-5.5, -3.2 + props.workTime / (600 * 2), 0]} height={props.workTime / 600 + zero} color={color(props.workTime, 'work')} lightColor={color(props.workTime + 200, 'work')}/>
+        <Box position={[-1.9, -3.2 + props.playTime / (510 * 2), 0]} height={props.playTime / 510 + zero} color={color(props.playTime, 'play')} lightColor={color(props.playTime + 100, 'play')}/>
+        <Box position={[1.7, -3.2 + props.offlineTime / (600 * 2), 0]} height={props.offlineTime / 600 + zero} color={color(props.offlineTime, 'offline')} lightColor={color(props.offlineTime + 200, 'offline')}/>
+        <Box position={[5.3, -3.2 + props.unallocatedTime / (30 * 2), 0]} height={props.unallocatedTime / 30 + zero} color={color(props.unallocatedTime, 'unallocated')} lightColor={color(props.unallocatedTime + 10, 'unallocated')}/>
+      </Canvas>
+    </div>
   )
 }

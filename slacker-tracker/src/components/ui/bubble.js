@@ -32,6 +32,43 @@ export default function Bubble (props) {
     else return 'score high'
   }
 
+  // const determineScoreLevel = (score) => {
+  //   let hue = 220
+  //   // colors go from 220 to 0 hue
+  //   // good range is from 100 to 150 (green) (150-100=50)
+  //   if (category === 'work') {
+  //     // optimal is 30 to 60 hours a week
+  //     // => 1800 to 3600 minutes a week
+  //     // => we need 50 hues every 1800
+  //     // => rate of color is 0.027777778
+  //     hue = hue - 0.027777778 * minutes
+  //     if (hue < 0) hue = 0
+  //   } else if (category === 'play') {
+  //     // optimal is 3 to 20 hours a week
+  //     // => 180 to 1200 minutes a week
+  //     // => we need 50 hues every 1020
+  //     // => rate of color is 0.049019608
+  //     hue = hue - 0.049019608 * minutes
+  //     if (hue < 0) hue = 0
+  //   } else if (category === 'offline') {
+  //     // optimal is 90 to 120 hours a week
+  //     // => 5400 to 7200 minutes a week
+  //     // => we need 50 hues every 1800
+  //     // => rate of color is 0.027777778
+  //     hue = hue - 0.027777778 * minutes
+  //     if (hue < 0) hue = 0
+  //   } else if (category === 'unallocated') {
+  //     // optimal is 90 to 120 hours a week
+  //     // => 0 to 60 minutes a week
+  //     // => we need 50 hues every 60
+  //     // => rate of color is 0.833333333
+  //     hue = hue - 0.833333333 * minutes
+  //     if (hue < 0) hue = 0
+  //   }
+
+  //   return 'hsl(' + hue + ', 89%, 79%)'
+  // }
+
   return (
     <div className="dashboard">
       {me && (
@@ -64,8 +101,8 @@ export default function Bubble (props) {
               <div className='status-container'>
                 <Avatar className="avatar" src={user.avatar} />
                 {(onlineUsersIdBubble.indexOf(user._id) !== -1)
-                  ? <div className='online-status-circle'></div>
-                  : <div className='offline-status-circle'></div>}
+                  ? <div className='online status-circle'></div>
+                  : <div className='offline status-circle'></div>}
               </div>
               <div className="name">
                 {user.name}
