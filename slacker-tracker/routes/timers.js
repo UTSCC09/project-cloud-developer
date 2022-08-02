@@ -84,7 +84,7 @@ router.get(
             )
             friendsInfo.forEach((friendInfo) => {
               const friendTimer = friendsTimer.find(
-                (el) => (el._id = friendInfo._id)
+                (el) => (el._id === friendInfo._id)
               )
               const singleData = {
                 _id: friendInfo._id,
