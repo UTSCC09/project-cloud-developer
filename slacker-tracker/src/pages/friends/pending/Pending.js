@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Alert, Paper, Avatar, Grid, Button } from '@mui/material'
+import { Alert, Paper, Avatar, Button } from '@mui/material'
 import Cookies from 'js-cookie'
 import CONST from '../../../CONST.js'
+import '../../../index.css'
 
 function Pending () {
   const [missingCookieAlert, setMissingCookieAlert] = useState(false)
@@ -87,35 +88,25 @@ function Pending () {
 
   return (
     <>
+      <div className="friends">
         <h2>PENDING FRIEND REQUEST</h2>
         {missingCookieAlert ? <Alert severity="error">Session time out! Please try to log in again</Alert> : null}
         {
             senders.map(sender => {
               return (
-                <Paper elevation={3} key={sender._id} sx={{ padding: 2, width: 800, margin: 1 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={1}>
-                        <Avatar src={null}/>
-                      </Grid>
-                      <Grid item xs={7}>
-                        <div className="friends-email">{sender.name}</div>
-                        <div className="friends-email">{sender.email}</div>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Grid container spacing={2}>
-                          <Grid item xs={6}>
-                            <Button variant="contained" onClick={() => handleAccept(sender.email)}>Accept</Button>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Button variant="contained" color='error' onClick={() => handleCancel(sender.email)}>Cancel</Button>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
+                <Paper className='friendReq' elevation={3} key={sender._id} sx={{ padding: 2, margin: 1 }}>
+                  <div>
+                    <Avatar src={null}/>
+                    <div className="friends-email">{sender.name}</div>
+                    <div className="friends-email">{sender.email}</div>
+                  </div>
+                  <Button sx={{ marginRight: 1 }} variant="contained" onClick={() => handleAccept(sender.email)}>Accept</Button>
+                  <Button variant="contained" color='error' onClick={() => handleCancel(sender.email)}>Cancel</Button>
                 </Paper>
               )
             })
-        }
+          }
+      </div>
     </>
   )
 }

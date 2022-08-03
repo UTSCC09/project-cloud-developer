@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { Paper, Avatar, Grid, Button } from '@mui/material'
+import { Paper, Avatar, Button } from '@mui/material'
+import '../../../index.css'
 
 function All () {
   const _id = Cookies.get('_id')
@@ -53,26 +54,22 @@ function All () {
   return (
     <>
       <h2>ALL FRIENDS</h2>
-      {
+      <div className="friends">
+        {
             friends.map(friend => {
               return (
-                <Paper elevation={3} key={friend._id} sx={{ padding: 2, width: 800, margin: 1 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={1}>
-                        <Avatar src={null}/>
-                      </Grid>
-                      <Grid item xs={9}>
-                      <div className="friends-email">{friend.name}</div>
-                        <div className="friends-email">{friend.email}</div>
-                      </Grid>
-                      <Grid item xs={2}>
-                        <Button variant="contained" color='error' onClick={() => handleDelete(friend.email)}>DELETE</Button>
-                      </Grid>
-                    </Grid>
+                <Paper className='friendReq' elevation={3} key={friend._id} sx={{ padding: 2, margin: 1 }}>
+                  <div>
+                    <Avatar src={null}/>
+                    <div className="friends-email">{friend.name}</div>
+                    <div className="friends-email">{friend.email}</div>
+                  </div>
+                  <Button variant="contained" color='error' onClick={() => handleDelete(friend.email)}>DELETE</Button>
                 </Paper>
               )
             })
-        }
+          }
+      </div>
     </>
   )
 }

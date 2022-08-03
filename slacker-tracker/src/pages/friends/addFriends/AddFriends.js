@@ -4,6 +4,7 @@ import { TextField, Button, Alert } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
 import Cookies from 'js-cookie'
 import CONST from '../../../CONST.js'
+import '../../../index.css'
 
 function AddFriends () {
   const [missingFieldAlert, setMissingFieldAlert] = useState(false)
@@ -59,9 +60,10 @@ function AddFriends () {
       {sendSuccess ? <Alert severity="success">Request sent successfully</Alert> : null}
       {serverAlert ? <Alert severity="error">{ serverAlert }</Alert> : null}
       <TextField
+        className='fg'
         fullWidth
-        InputLabelProps={{ style: { color: 'white' } }}
-        sx={{ marginTop: 2, input: { color: 'white' } }}
+        InputLabelProps={{ style: { color: 'var(--fg_color)' } }}
+        sx={{ marginTop: 2, input: { color: 'var(--fg_color)' } }}
         color="secondary"
         label="Enter a email"
         type="email"

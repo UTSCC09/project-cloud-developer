@@ -26,14 +26,15 @@ function Friends () {
     <div>
         <Nav></Nav>
         <Box id='friends-side-nav' sx={{ flexGrow: 1, display: 'flex' }}>
-            <Tabs orientation="vertical"
+            <Tabs className='tabs'
+                  orientation="vertical"
                   variant="scrollable"
                   value={value}
                   onChange={handleChange}
-                  sx={{ borderRight: 1, borderColor: 'divider' }}>
-                <Tab sx={{ color: 'white' }} label="All" {...a11yProps(0)}/>
-                <Tab sx={{ color: 'white' }} label="Pending" {...a11yProps(1)}/>
-                <Tab sx={{ color: 'white' }} label="Add Friends" {...a11yProps(2)}/>
+                  sx={{ overflow: 'visible', borderRight: 1, borderColor: 'divider' }}>
+                <Tab sx={{ color: 'var(--fg_color)' }} label="All" {...a11yProps(0)}/>
+                <Tab sx={{ color: 'var(--fg_color)' }} label="Pending" {...a11yProps(1)}/>
+                <Tab sx={{ color: 'var(--fg_color)' }} label="Add Friends" {...a11yProps(2)}/>
             </Tabs>
             <TabPanel value={value} index={0}>
                 <All />
