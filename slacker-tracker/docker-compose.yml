@@ -23,7 +23,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./acme:/etc/acme.sh
     environment:
-        - DEFAULT_EMAIL=andrew@thecross.ca
+        - DEFAULT_EMAIL=andrew.damario@mail.utoronto.ca
         
   frontend:
     # image: ghcr.io/UTSCC09/frontend-andrewaclear
@@ -35,8 +35,8 @@ services:
     expose:
       - 80
     environment:
-      - VIRTUAL_HOST=<your_domain>
-      - LETSENCRYPT_HOST=<your_domain>
+      - VIRTUAL_HOST=www.slackertracker.software
+      - LETSENCRYPT_HOST=www.slackertracker.software
       
   backend:
     # image: ghcr.io/UTSCC09/backend-andrewaclear
@@ -48,6 +48,6 @@ services:
     expose:
       - 3000
     environment:
-      - VIRTUAL_HOST=api.<your_domain>
-      - LETSENCRYPT_HOST=api.<your_domain>
+      - VIRTUAL_HOST=api.www.slackertracker.software
+      - LETSENCRYPT_HOST=api.www.slackertracker.software
      
