@@ -3,6 +3,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Paper, Avatar, Button } from '@mui/material'
 import '../../../index.css'
+import CONST from '../../../CONST.js'
 
 function All () {
   const _id = Cookies.get('_id')
@@ -11,7 +12,7 @@ function All () {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/friendList?_id=${_id}`,
+      url: `${CONST.backendURL}/api/friendList?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       setFriends(res.data.data)
@@ -24,7 +25,7 @@ function All () {
   const handleDelete = friendEmail => {
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/user?_id=${_id}`,
+      url: `${CONST.backendURL}/api/user?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -32,7 +33,7 @@ function All () {
       const email1 = res.data.user.email
       axios({
         method: 'DELETE',
-        url: 'http://localhost:3001/api/friendList/deleteFriend',
+        url: CONST.backendURL + '/api/friendList/deleteFriend',
         data: {
           email1,
           email2: friendEmail

@@ -4,7 +4,7 @@ import { PlayArrow } from '@mui/icons-material'
 import TimerSelect from './timerSelect/TimerSelect'
 // import axios from 'axios'
 // import Cookies from 'js-cookie'
-// import CONST from './CONST'
+// import CONST from './CONST.js'
 
 export default function TimerStart () {
   const [showDrawer, setShowDrawer] = useState(false)

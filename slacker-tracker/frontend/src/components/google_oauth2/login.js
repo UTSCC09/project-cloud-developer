@@ -19,7 +19,7 @@ export default function Login () {
     console.log('LOGIN SUCCESS! Current user: ', res)
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/user/oauth2/google',
+      url: CONST.backendURL + '/api/user/oauth2/google',
       data: {
         googleId: res.profileObj.googleId,
         name: res.profileObj.name,

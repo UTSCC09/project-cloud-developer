@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { TextField, Button, Alert } from '@mui/material'
+import CONST from '../../../CONST.js'
 
 function Study () {
   const [missingFieldAlert, setMissingFieldAlert] = useState(false)
@@ -13,7 +14,7 @@ function Study () {
     if (!email) return setMissingCookieAlert(true)
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/timer/self?email=${email}`,
+      url: `${CONST.backendURL}/api/timer/self?email=${email}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -31,7 +32,7 @@ function Study () {
     if (!studyTime) return setMissingFieldAlert(true)
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/timer/allocateTimer',
+      url: CONST.backendURL + '/api/timer/allocateTimer',
       data: {
         email,
         dutyName: 'Study',
@@ -52,7 +53,7 @@ function Study () {
     if (!studyTime) return setMissingFieldAlert(true)
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/timer/modifyTimer',
+      url: CONST.backendURL + '/api/timer/modifyTimer',
       data: {
         email,
         dutyName: 'Study',

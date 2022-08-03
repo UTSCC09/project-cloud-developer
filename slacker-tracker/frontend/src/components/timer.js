@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Menu, MenuItem, Fab, Tooltip, styled, Typography } from '@mui/material'
 import { PlayArrow } from '@mui/icons-material'
-// import CONST from './CONST'
+// import CONST from './CONST.js'
 
 export default function Timer () {
   const StyledFab = styled(Fab)({

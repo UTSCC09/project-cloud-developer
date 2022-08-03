@@ -3,7 +3,7 @@ import { Avatar } from '@mui/material'
 import timeConvert from '../../utils/timeConvert'
 import PropTypes from 'prop-types'
 import Bar from './bar'
-import CONST from '../../CONST'
+import CONST from '../../CONST.js'
 import './bubble.css'
 
 Bubble.propTypes = {

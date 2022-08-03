@@ -3,6 +3,7 @@ import { Alert, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/m
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import Cookies from 'js-cookie'
+import CONST from '../../../../CONST.js'
 
 TimerSelect.propTypes = {
   selectedTimerDutyName: PropTypes.any,
@@ -26,7 +27,7 @@ export default function TimerSelect (props) {
     if (!email) return setMissingCookieAlert(true)
     axios({
       method: 'GET',
-      url: `http://localhost:3001/api/timer/self?email=${email}`,
+      url: `${CONST.backendURL}/api/timer/self?email=${email}`,
       withCredentials: true
     }).then((res) => {
       console.log(res)
@@ -73,7 +74,7 @@ export default function TimerSelect (props) {
     setIsStarted(true)
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/timer/startTimer',
+      url: CONST.backendURL + '/api/timer/startTimer',
       data: {
         email,
         dutyName: selectedTimerDutyName
@@ -91,7 +92,7 @@ export default function TimerSelect (props) {
     stopTimeElapsed()
     axios({
       method: 'POST',
-      url: 'http://localhost:3001/api/timer/stopTimer',
+      url: CONST.backendURL + '/api/timer/stopTimer',
       data: {
         email,
         dutyName: selectedTimerDutyName,

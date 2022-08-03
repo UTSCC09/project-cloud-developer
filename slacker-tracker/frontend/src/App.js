@@ -7,7 +7,7 @@ import Friends from './pages/friends/Friends'
 import TimerView from './pages/timerView/TimerView'
 import Summary from './pages/summary/Summary'
 import { io } from 'socket.io-client'
-import CONST from './CONST'
+import CONST from './CONST.js'
 
 function App () {
   const socket = io(CONST.backendURL)
