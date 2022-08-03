@@ -52,7 +52,7 @@
   background-color: rgba(131, 131, 131, 0.199);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --bg_color: rgb(212, 212, 221);
     --bg_color_dark: rgb(225, 225, 232);
@@ -70,6 +70,10 @@ body {
   color: var(--fg_color);
   background-color: var(--bg_color);
   overflow: auto
+}
+
+.fg {
+  color: var(--fg_color);
 }
 
 code {
@@ -140,7 +144,7 @@ a {
   /* flex-direction: column; */
   align-items: space-between;
   justify-content: space-between;
-  min-width: 10em;
+  /* min-width: 10em; */
   transition: box-shadow 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 .bubble:hover {
@@ -224,12 +228,12 @@ a {
   align-items: flex-start;
 }
 .offline.status-circle {
-  background-color: grey;
-  border: 2px solid white;
+  background-color: rgb(157, 162, 177);
+  border: 2px solid rgb(224, 224, 224);
 }
 .online.status-circle {
-  background-color: rgb(26, 196, 26);
-  border: 2px solid white;
+  background-color: rgb(66, 185, 137);
+  border: 2px solid rgb(215, 215, 215);
 }
 
 .status-container {
