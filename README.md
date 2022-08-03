@@ -26,8 +26,8 @@ If at the end of the week you have spent an acceptable amount of time doing each
 ### Challenge Factor
 
 * Oauth: email confirmation and Google sign in.
-* Non-trivial frontend: 3D bar graphs with gradient color calculated based on the optimal ranges for each category.
-* Websocket, Real-time interactions: current status, current running timer and record the time when user closes/open app or the app is no longer active.
+* Non-trivial frontend: 3D bar graphs with gradient color calculated based on the optimal ranges for each category, animated wobble hover, and realtime height updates based on the currently running timer for the current user and their friends.
+* Websocket: real-time interactions of current status (online/offline) and current running timer of friends.
 * Service workers: send email of user's information and automatically update slacker score every Monday.
 * Nginx as proxy server.
 
@@ -41,6 +41,7 @@ If at the end of the week you have spent an acceptable amount of time doing each
 ### Final version
 
 * Add user details: name and slacker-tracker score.
+* Automatic light/dark mode matching system theme.
 * Seeing friends 3D weekly bar graph of their time allocation summary.
 * Offline time is calculated when the app is not open i.e. not on your computer, and unallocated time when you are running any timer.
 
@@ -59,6 +60,12 @@ AWS with Ubuntu VM and Docker
 ## Development
 
 Running our app for development.
+
+Clone our repository and enter into it.
+```sh
+git clone https://github.com/UTSCC09/project-cloud-developer.git
+cd project-cloud-developer
+```
 
 Install node modules:
 ```sh
