@@ -147,19 +147,29 @@ io.on('connection', function (socket) {
     if (onlineUsersId.indexOf(data._id) === -1) {
       onlineUsersId.push(data._id)
     }
-    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
-    socket.emit('updateOnlineUsers', { onlineUsersId })
+    io.emit('updateOnlineUsers', { onlineUsersId })
+    // console.log('LOGIN current online users' + onlineUsersId)
   })
 
   socket.on('logout', function (data) {
     console.log('a user ' + data._id + ' disconnected')
     onlineUsersId = onlineUsersId.filter((userId) => userId !== data._id)
-    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
+    io.emit('updateOnlineUsers', { onlineUsersId })
+    // console.log('LOGOUT current online users' + onlineUsersId)
+    // TODO: run offline timer for this user
+  })
+
+  socket.on('refresh', function () {
+    socket.broadcast.emit('refresh')
+    // console.log('REFRESH current online users' + onlineUsersId)
   })
 
   socket.on('disconnect', function () {
     console.log('user ' + socket.id + ' disconnected')
     onlineUsersId = onlineUsersId.filter((userId) => userId !== socket.userId)
-    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
+    io.emit('updateOnlineUsers', { onlineUsersId })
+    // console.log('DISCONNECT current online users' + onlineUsersId)
+    // TODO: run offline timer for this user
+    // TODO: make disconnect stick (bounces back to green)
   })
 })

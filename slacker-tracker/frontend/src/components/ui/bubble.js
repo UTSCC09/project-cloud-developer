@@ -7,22 +7,23 @@ import CONST from '../../CONST'
 import './bubble.css'
 
 Bubble.propTypes = {
-  onlineUsersId: PropTypes.any,
+  onlineUsersId: PropTypes.array,
   me: PropTypes.any,
   users: PropTypes.any,
   refreshBubbles: PropTypes.func,
   timeNow: PropTypes.number,
   startTime: PropTypes.number,
-  timerStarted: PropTypes.any
+  timerStarted: PropTypes.any,
+  socket: PropTypes.any
 }
 
 export default function Bubble (props) {
-  const [onlineUsersIdBubble, setonlineUsersIdBubble] = useState(props.onlineUsersId)
+  // const [onlineUsersIdBubble, setonlineUsersIdBubble] = useState(props.onlineUsersId)
   const [me, setMe] = useState(props.me)
   const [users, setUsers] = useState(props.users)
 
   useEffect(() => {
-    setonlineUsersIdBubble(props.onlineUsersId)
+    // setonlineUsersIdBubble(props.onlineUsersId)
     setMe(props.me)
     setUsers(props.users)
     // props.refreshBubbles()
@@ -103,7 +104,7 @@ export default function Bubble (props) {
             <div>
               <div className='status-container'>
                 <Avatar className="avatar" src={user.avatar} />
-                {(onlineUsersIdBubble.indexOf(user._id) !== -1)
+                {(props.onlineUsersId.indexOf(user._id) !== -1)
                   ? <div className='online status-circle'></div>
                   : <div className='offline status-circle'></div>}
               </div>

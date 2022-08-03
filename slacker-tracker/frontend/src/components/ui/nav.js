@@ -8,11 +8,10 @@ import { useGoogleLogout } from 'react-google-login'
 import CONST from '../../CONST'
 import Cookies from 'js-cookie'
 import '../../index.css'
-import { io } from 'socket.io-client'
 import PropTypes from 'prop-types'
 
 ButtonAppBar.propTypes = {
-  setOnlineUsersId: PropTypes.func
+  socket: PropTypes.any
 }
 
 export default function ButtonAppBar (props) {
@@ -21,11 +20,7 @@ export default function ButtonAppBar (props) {
 
   const navigate = useNavigate()
 
-  const socket = io(CONST.backendURL)
-
   const _id = Cookies.get('_id')
-
-  const { setOnlineUsersId } = props
 
   const onLogoutSuccess = () => {
     console.log('LOGOUT SUCCESS!')
@@ -43,17 +38,6 @@ export default function ButtonAppBar (props) {
       withCredentials: true
     }).then((res) => {
       setMe(res.data.user)
-      socket.on('connect', () => {
-        console.log('socket connected')
-        socket.emit('login', { _id })
-      })
-      socket.on('connect_error', (err) => {
-        console.log(`connect_error due to ${err.message}`)
-      })
-      socket.on('updateOnlineUsers', onlineUsersId => {
-        if (!setOnlineUsersId) return
-        setOnlineUsersId(onlineUsersId.onlineUsersId)
-      })
     }).catch((err) => {
       console.log(err)
       navigate('/signin', { replace: true })
@@ -76,7 +60,7 @@ export default function ButtonAppBar (props) {
       withCredentials: true
     }).then(res => {
       console.log(res)
-      socket.emit('logout', { _id })
+      props.socket.emit('logout', { _id })
       navigate('/signin', { replace: true })
     }).catch(err => {
       console.log(err)

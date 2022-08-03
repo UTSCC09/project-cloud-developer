@@ -9,13 +9,19 @@ import VideogameAssetIcon from '@mui/icons-material/VideogameAsset'
 import CONST from '../../CONST'
 import timeConvert from '../../utils/timeConvert'
 import '../../index.css'
+import PropTypes from 'prop-types'
 
-function Home () {
+Home.propTypes = {
+  socket: PropTypes.any,
+  onlineUsersId: PropTypes.array
+}
+
+function Home (props) {
   const [timerStarted, setTimerStarted] = React.useState('unallocate')
   const [startTime, setStartTime] = React.useState(new Date().getTime())
   const [timeNow, setTimeNow] = React.useState(new Date().getTime())
-  const [onlineUsersId, setOnlineUsersId] = React.useState([])
   const _id = Cookies.get('_id')
+  const { onlineUsersId } = props
 
   React.useEffect(() => {
     axios({
@@ -24,10 +30,14 @@ function Home () {
       withCredentials: true
     }).then((res) => {
       // console.log(res)
+      props.socket.emit('login', { _id })
       if (res.data.data.duty.name !== 'unallocate' && res.data.data.duty.name !== 'offline') {
         setTimerStarted(res.data.data.duty.name)
         setStartTime(new Date(res.data.data.duty.startTime).getTime())
       }
+      props.socket.on('refresh', () => {
+        refreshBubbles()
+      })
       refreshBubbles()
     }).catch((err) => {
       console.log(err)
@@ -36,10 +46,10 @@ function Home () {
     const interval = setInterval(() => {
       setTimeNow(new Date().getTime())
     }, 1000)
-    const interval2 = setInterval(() => refreshBubbles(), 3000)
+    // const interval2 = setInterval(() => refreshBubbles(), 3000)
     return () => {
       clearInterval(interval)
-      clearInterval(interval2)
+      // clearInterval(interval2)
     }
   }, [])
 
@@ -82,6 +92,7 @@ function Home () {
       setTimerStarted('work')
       setStartTime(new Date().getTime())
       refreshBubbles()
+      props.socket.emit('refresh')
       // console.log(res)
     }).catch((err) => {
       console.log(err)
@@ -101,7 +112,8 @@ function Home () {
       setTimerStarted('play')
       setStartTime(new Date().getTime())
       refreshBubbles()
-      console.log(res)
+      props.socket.emit('refresh')
+      // console.log(res)
     }).catch((err) => {
       console.log(err)
     })
@@ -121,6 +133,7 @@ function Home () {
       setStartTime(new Date().getTime())
       setTimeNow(new Date().getTime())
       refreshBubbles()
+      props.socket.emit('refresh')
     }).catch((err) => {
       console.log(err)
     })
@@ -128,9 +141,9 @@ function Home () {
   return (
     <div>
       <div className="board">
-        <Bubble refreshBubbles={refreshBubbles} me={me} users={users} onlineUsersId={onlineUsersId} timeNow={timeNow} startTime={startTime} timerStarted={timerStarted}></Bubble>
+        <Bubble refreshBubbles={refreshBubbles} me={me} users={users} onlineUsersId={onlineUsersId} timeNow={timeNow} startTime={startTime} timerStarted={timerStarted} socket={props.socket}></Bubble>
       </div>
-      <Nav setOnlineUsersId={setOnlineUsersId}></Nav>
+      <Nav socket={props.socket} ></Nav>
       {
         timerStarted === 'unallocate' &&
         <Paper className='timer' sx={{ position: 'fixed', right: 20, bottom: 20 }}>
