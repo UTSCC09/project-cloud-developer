@@ -239,3 +239,23 @@ a {
 .status-container {
   position: relative;
 }
+
+.timer {
+  box-shadow: var(--button-shadow)!important;
+  border-radius: 18px!important;
+}
+.work {
+  border-radius: 18px 0 0 18px!important;
+}
+.play {
+  border-radius: 0 18px 18px 0!important;
+}
+.stop {
+  border-radius: 18px!important;
+}
+.timer:hover {
+  box-shadow: var(--button-hover-shadow)!important;
+}
+.timer:active {
+  box-shadow: var(--button-active-shadow)!important;
+}
