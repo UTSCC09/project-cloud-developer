@@ -55,3 +55,22 @@ If at the end of the week you have spent an acceptable amount of time doing each
 ### Deployment
 
 AWS with Ubuntu VM and Docker
+
+## Development
+
+Running our app for development.
+
+Install node modules:
+```sh
+cd slacker-tracker && npm i
+cd frontend && npm i --force
+cd ../backend && npm i
+cd ..
+```
+
+Run:
+```sh
+npm start
+```
+
+Now our app is accessible at http://localhost:3000.
