@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import PropTypes from 'prop-types'
+import { useSpring, animated, config } from '@react-spring/three'
 
 Box.propTypes = {
   height: PropTypes.number,
@@ -25,13 +26,18 @@ function Box (props) {
     // ref.current.rotation.z += 0.01
   })
 
+  const { scale } = useSpring({
+    scale: hovered ? 1.1 : 1,
+    config: config.wobbly
+  })
+
   // Return the view, these are regular Threejs elements expressed in JSX
   return (
-    <mesh
+    <animated.mesh
       {...props}
       ref={ref}
       // scale={function (event) { if (event.hovered) { return 1.01 } else if (event.clicked) { return 0.09 } else { return 1 } } }
-      scale={hovered ? 1.06 : 1}
+      scale={scale}
       onClick={(event) => click(!clicked)}
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
@@ -47,7 +53,7 @@ function Box (props) {
         // envMap: envMap, // important -- especially for metals!
         // envMapIntensity: envMapIntensity
       />
-    </mesh>
+    </animated.mesh>
   )
 }
 
