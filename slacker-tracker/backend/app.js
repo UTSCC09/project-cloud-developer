@@ -151,7 +151,6 @@ io.on('connection', function (socket) {
       onlineUsersId.push(data._id)
     }
     io.emit('updateOnlineUsers', { onlineUsersId })
-    console.log(socketUserId)
     // console.log('LOGIN current online users' + onlineUsersId)
   })
 
@@ -171,10 +170,10 @@ io.on('connection', function (socket) {
   // set up disconnection
   socket.on('disconnect', function () {
     if (!socketUserId[socket.id]) return
-    console.log('user ' + socketUserId[socket.id] + ' disconnected')
+    console.log('a user ' + socketUserId[socket.id] + ' disconnected')
     onlineUsersId = onlineUsersId.filter((userId) => userId !== socketUserId[socket.id])
     io.emit('updateOnlineUsers', { onlineUsersId })
-    console.log('DISCONNECT current online users' + onlineUsersId)
+    // console.log('DISCONNECT current online users' + onlineUsersId)
     // TODO: run offline timer for this user
   })
 
