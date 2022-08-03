@@ -8,11 +8,12 @@ import WorkIcon from '@mui/icons-material/Work'
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset'
 import CONST from '../../CONST'
 import timeConvert from '../../utils/timeConvert'
+import '../../index.css'
 
 function Home () {
-  const [timerStarted, setTimerStarted] = React.useState(null)
-  const [startTime, setStartTime] = React.useState(null)
-  const [timeNow, setTimeNow] = React.useState(null)
+  const [timerStarted, setTimerStarted] = React.useState('unallocate')
+  const [startTime, setStartTime] = React.useState(new Date().getTime())
+  const [timeNow, setTimeNow] = React.useState(new Date().getTime())
   const [onlineUsersId, setOnlineUsersId] = React.useState([])
   const _id = Cookies.get('_id')
 
@@ -22,7 +23,7 @@ function Home () {
       url: `${CONST.backendURL}/api/timer/self?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
-      console.log(res)
+      // console.log(res)
       if (res.data.data.duty.name !== 'unallocate' && res.data.data.duty.name !== 'offline') {
         setTimerStarted(res.data.data.duty.name)
         setStartTime(new Date(res.data.data.duty.startTime).getTime())
@@ -32,7 +33,9 @@ function Home () {
       console.log(err)
     })
     setTimeNow(new Date().getTime())
-    const interval = setInterval(() => setTimeNow(new Date().getTime()), 1000 * 60)
+    const interval = setInterval(() => {
+      setTimeNow(new Date().getTime())
+    }, 1000)
     const interval2 = setInterval(() => refreshBubbles(), 3000)
     return () => {
       clearInterval(interval)
@@ -49,7 +52,7 @@ function Home () {
       url: `${CONST.backendURL}/api/timer/self?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
-      console.log(res)
+      // console.log(res)
       setMe(res.data.data)
     }).catch((err) => {
       console.log(err)
@@ -59,7 +62,7 @@ function Home () {
       url: `${CONST.backendURL}/api/timer/friends?_id=${_id}`,
       withCredentials: true
     }).then((res) => {
-      console.log(res)
+      // console.log(res)
       setUsers(res.data.data)
     }).catch((err) => {
       console.log(err)
@@ -79,7 +82,7 @@ function Home () {
       setTimerStarted('work')
       setStartTime(new Date().getTime())
       refreshBubbles()
-      console.log(res)
+      // console.log(res)
     }).catch((err) => {
       console.log(err)
     })
@@ -114,7 +117,9 @@ function Home () {
       },
       withCredentials: true
     }).then((res) => {
-      setTimerStarted(null)
+      setTimerStarted('unallocate')
+      setStartTime(new Date().getTime())
+      setTimeNow(new Date().getTime())
       refreshBubbles()
     }).catch((err) => {
       console.log(err)
@@ -123,20 +128,20 @@ function Home () {
   return (
     <div>
       <div className="board">
-        <Bubble refreshBubbles={refreshBubbles} me={me} users={users} onlineUsersId={onlineUsersId}></Bubble>
+        <Bubble refreshBubbles={refreshBubbles} me={me} users={users} onlineUsersId={onlineUsersId} timeNow={timeNow} startTime={startTime} timerStarted={timerStarted}></Bubble>
       </div>
       <Nav setOnlineUsersId={setOnlineUsersId}></Nav>
       {
-        !timerStarted &&
-        <Paper sx={{ position: 'fixed', right: 20, bottom: 20 }}>
+        timerStarted === 'unallocate' &&
+        <Paper className='timer' sx={{ position: 'fixed', right: 20, bottom: 20 }}>
           <Tooltip title="Start Work Timer">
-            <Button variant="contained" onClick={handleStartWorkTimer}>
+            <Button className='work' variant="contained" onClick={handleStartWorkTimer}>
               <WorkIcon sx={{ mr: 1 }} />
                 Work
             </Button>
           </Tooltip>
           <Tooltip title="Start Play Timer">
-            <Button variant="extended" onClick={handleStartPlayTimer}>
+            <Button className='play' variant="extended" onClick={handleStartPlayTimer}>
               <VideogameAssetIcon sx={{ mr: 1 }} />
                 Play
             </Button>
@@ -144,10 +149,10 @@ function Home () {
         </Paper>
       }
       {
-        timerStarted &&
-        <Paper sx={{ position: 'fixed', right: 20, bottom: 20 }}>
-          <Button variant="contained" color='error' onClick={handleStopTimer}>
-            Stop {timerStarted !== 'play' ? timerStarted : 'play'} Timer({timeConvert.convertMsToHM(timeNow - startTime)})
+        timerStarted !== 'unallocate' &&
+        <Paper className='timer' sx={{ position: 'fixed', right: 20, bottom: 20 }}>
+          <Button className='stop' variant="contained" color='error' onClick={handleStopTimer}>
+            Stop {timerStarted !== 'play' ? timerStarted : 'play'} Timer ({timeConvert.convertMsToHMS(timeNow - startTime)})
           </Button>
         </Paper>
       }

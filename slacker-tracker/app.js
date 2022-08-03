@@ -142,6 +142,7 @@ let onlineUsersId = []
 
 io.on('connection', function (socket) {
   socket.on('login', function (data) {
+    socket.userId = data._id
     console.log('a user ' + data._id + ' connected')
     if (onlineUsersId.indexOf(data._id) === -1) {
       onlineUsersId.push(data._id)
@@ -158,5 +159,7 @@ io.on('connection', function (socket) {
 
   socket.on('disconnect', function () {
     console.log('user ' + socket.id + ' disconnected')
+    onlineUsersId = onlineUsersId.filter((userId) => userId !== socket.userId)
+    socket.broadcast.emit('updateOnlineUsers', { onlineUsersId })
   })
 })

@@ -10,7 +10,10 @@ Bubble.propTypes = {
   onlineUsersId: PropTypes.any,
   me: PropTypes.any,
   users: PropTypes.any,
-  refreshBubbles: PropTypes.func
+  refreshBubbles: PropTypes.func,
+  timeNow: PropTypes.number,
+  startTime: PropTypes.number,
+  timerStarted: PropTypes.any
 }
 
 export default function Bubble (props) {
@@ -23,7 +26,7 @@ export default function Bubble (props) {
     setMe(props.me)
     setUsers(props.users)
     // props.refreshBubbles()
-    console.log(props.onlineUsersId)
+    // console.log(props.onlineUsersId)
   }, [props.onlineUsersId, props.me, props.users])
 
   const determineScoreLevel = score => {
@@ -83,7 +86,7 @@ export default function Bubble (props) {
             {/* <IconButton alt={me.score} /> */}
           </div>
           <div className="stats">
-            <Bar workTime={ me.workTimeSpent / CONST.milsecPerMin } playTime={ me.playTimeSpent / CONST.milsecPerMin } offlineTime={ me.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ me.unallocatedTime / CONST.milsecPerMin } ></Bar>
+            <Bar workTime={ me.workTimeSpent / CONST.milsecPerMin } playTime={ me.playTimeSpent / CONST.milsecPerMin } offlineTime={ me.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ me.unallocatedTime / CONST.milsecPerMin } timeNow={props.timeNow / CONST.milsecPerMin} startTime={props.startTime / CONST.milsecPerMin} timerStarted={props.timerStarted} ></Bar>
             <div className="details">
               <div className={me.duty.name === 'work' ? 'glow' : ''}><div>Work:</div><div>{ timeConvert.convertMsToHM(me.workTimeSpent) } hrs</div></div>
               <div className={me.duty.name === 'play' ? 'glow' : ''}><div>Play:</div><div>{ timeConvert.convertMsToHM(me.playTimeSpent) } hrs</div></div>
@@ -111,7 +114,7 @@ export default function Bubble (props) {
             </div>
             {/* <IconButton alt={user.score} /> */}
             <div className="stats">
-              <Bar workTime={ user.workTimeSpent / CONST.milsecPerMin } playTime={ user.playTimeSpent / CONST.milsecPerMin } offlineTime={ user.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ user.unallocatedTimeSpent / CONST.milsecPerMin } ></Bar>
+              <Bar workTime={ user.workTimeSpent / CONST.milsecPerMin } playTime={ user.playTimeSpent / CONST.milsecPerMin } offlineTime={ user.offlineTimeSpent / CONST.milsecPerMin } unallocatedTime={ user.unallocatedTimeSpent / CONST.milsecPerMin } timeNow={props.timeNow / CONST.milsecPerMin} startTime={new Date(user.duty.startTime).getTime() / CONST.milsecPerMin} timerStarted={user.duty.name} ></Bar>
               <div className="details">
                 <div className={user.duty.name === 'work' ? 'glow' : ''}><div>Work:</div><div>{ timeConvert.convertMsToHM(user.workTimeSpent) } hrs</div></div>
                 <div className={user.duty.name === 'play' ? 'glow' : ''}><div>Play:</div><div>{ timeConvert.convertMsToHM(user.playTimeSpent) } hrs</div></div>
