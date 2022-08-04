@@ -1,0 +1,1319 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Slacker Tracker API 1.0",
+    "description": "This is the api doc for slacker tracker",
+    "contact": {
+      "email": "mageguinsoo@gmail.com"
+    },
+    "version": "1.0.11"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "timer",
+      "description": "Everything about timer"
+    },
+    {
+      "name": "friendList",
+      "description": "Friend list features"
+    },
+    {
+      "name": "user",
+      "description": "Operations about user"
+    },
+    {
+      "name": "summaryEmail",
+      "description": "Generate the weekly summary email"
+    }
+  ],
+  "paths": {
+    "/timer/self": {
+      "get": {
+        "tags": [
+          "timer"
+        ],
+        "summary": "Get user's timer",
+        "description": "Get all the information of user's timers",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string",
+                      "description": "The user ID."
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "The user's name."
+                    },
+                    "slackerScore": {
+                      "type": "number",
+                      "description": "The user's slacker score."
+                    },
+                    "workTimeSpent": {
+                      "type": "number",
+                      "description": "The user's total work time."
+                    },
+                    "playTimeSpent": {
+                      "type": "number",
+                      "description": "The user's total play time."
+                    },
+                    "offlineTimeSpent": {
+                      "type": "number",
+                      "description": "The user's total offline time."
+                    },
+                    "unallocatedTimeSpent": {
+                      "type": "number",
+                      "description": "The user's total unallocated time."
+                    },
+                    "duty": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The thing that user is currently working on."
+                        },
+                        "startTime": {
+                          "type": "string",
+                          "description": "The start time."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "user not found"
+          },
+          "422": {
+            "description": "id validation error"
+          }
+        }
+      }
+    },
+    "/timer/friends": {
+      "get": {
+        "tags": [
+          "timer"
+        ],
+        "summary": "Get user's timer",
+        "description": "Get all the information of all friends' timers",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "description": "The user ID."
+                      },
+                      "friendName": {
+                        "type": "string",
+                        "description": "The friend's name."
+                      },
+                      "slackerScore": {
+                        "type": "number",
+                        "description": "The friend's slacker score."
+                      },
+                      "workTimeSpent": {
+                        "type": "number",
+                        "description": "The friend's total work time."
+                      },
+                      "playTimeSpent": {
+                        "type": "number",
+                        "description": "The friend's total play time."
+                      },
+                      "offlineTimeSpent": {
+                        "type": "number",
+                        "description": "The friend's total offline time."
+                      },
+                      "unallocatedTimeSpent": {
+                        "type": "number",
+                        "description": "The friend's total unallocated time."
+                      },
+                      "duty": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The thing that friend is currently working on."
+                          },
+                          "startTime": {
+                            "type": "string",
+                            "description": "The start time."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "user not found"
+          },
+          "422": {
+            "description": "id validation error"
+          }
+        }
+      }
+    },
+    "/timer/startTimer": {
+      "post": {
+        "tags": [
+          "timer"
+        ],
+        "summary": "Start a timer for a user",
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "User's unique ID"
+                  },
+                  "dutyName": {
+                    "type": "string",
+                    "description": "The timer user want to start"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "User is offline or doing other things"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/timer/stopTimer": {
+      "post": {
+        "tags": [
+          "timer"
+        ],
+        "summary": "Stop a timer for a user",
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "User's unique ID"
+                  },
+                  "dutyName": {
+                    "type": "string",
+                    "description": "The timer user want to stop"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "The name of timer is wrong"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/friendList/": {
+      "get": {
+        "tags": [
+          "friendList"
+        ],
+        "summary": "Get user's friendList",
+        "description": "Get user's friendList",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "description": "The user ID."
+                      },
+                      "friendName": {
+                        "type": "string",
+                        "description": "The friend's name."
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "The friend's email."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "user not found"
+          },
+          "422": {
+            "description": "id validation error"
+          }
+        }
+      }
+    },
+    "/friendList/getRequest": {
+      "get": {
+        "tags": [
+          "friendList"
+        ],
+        "summary": "Get user's pending friend requests",
+        "description": "Get user's pending friend requests",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "description": "The user ID."
+                      },
+                      "friendName": {
+                        "type": "string",
+                        "description": "The user's name of pending request"
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "The user's email of pending request"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "user not found"
+          },
+          "422": {
+            "description": "id validation error"
+          }
+        }
+      }
+    },
+    "/friendList/sendRequest": {
+      "post": {
+        "tags": [
+          "friendList"
+        ],
+        "summary": "Send friend request",
+        "description": "Send a friend request from sender to receiver",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "senderEmail": {
+                    "type": "string",
+                    "description": "The sender's email address"
+                  },
+                  "receiverEmail": {
+                    "type": "string",
+                    "description": "The receiver's email address"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "Two user are already friends"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/friendList/acceptRequest": {
+      "post": {
+        "tags": [
+          "friendList"
+        ],
+        "summary": "Accept friend request",
+        "description": "Accept a friend request from sender to receiver",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "senderEmail": {
+                    "type": "string",
+                    "description": "The sender's email address"
+                  },
+                  "receiverEmail": {
+                    "type": "string",
+                    "description": "The receiver's email address"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "Two user are already friends"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/friendList/cancelRequest": {
+      "post": {
+        "tags": [
+          "friendList"
+        ],
+        "summary": "Cancel friend request",
+        "description": "Cancel a friend request from sender to receiver",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "senderEmail": {
+                    "type": "string",
+                    "description": "The sender's email address"
+                  },
+                  "receiverEmail": {
+                    "type": "string",
+                    "description": "The receiver's email address"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/friendList/deleteRequest": {
+      "post": {
+        "tags": [
+          "friendList"
+        ],
+        "summary": "Delete friend request",
+        "description": "Delete a friend request from sender to receiver",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email1": {
+                    "type": "string",
+                    "description": "The first user's email address"
+                  },
+                  "email2": {
+                    "type": "string",
+                    "description": "The second user's email address"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get user's info",
+        "description": "Get user's information",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "description": "The user ID."
+                      },
+                      "avatar": {
+                        "type": "string",
+                        "description": "The url for the user's avatar"
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "The user's email."
+                      },
+                      "bio": {
+                        "type": "string",
+                        "description": "The user's bio"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The user's name"
+                      },
+                      "slackerScore": {
+                        "type": "number",
+                        "description": "The user's slacker score"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "user not found"
+          },
+          "422": {
+            "description": "id validation error"
+          }
+        }
+      }
+    },
+    "/user/name": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "change the name for user",
+        "description": "change the name for user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "User's unique ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The new name for the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/email": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "change the email for user",
+        "description": "change the email for user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "User's unique ID"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "The new email for the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/bio": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "change the bio for user",
+        "description": "change the bio for user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "User's unique ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The new bio for the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/password": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "change the password for user",
+        "description": "change the password for user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "User's unique ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The new password for the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/avatar": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get user's avatar",
+        "description": "Get user's avatar",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "headers": {
+              "content-type": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "The type of the avatar"
+              }
+            },
+            "content": {
+              "application/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/jpg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "user not found"
+          },
+          "422": {
+            "description": "id validation error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "change the avatar for user",
+        "description": "change the avatar for user",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "application/jpg": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "Wrong file type"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/signup": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Create an account for the user",
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name for the user"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "The email for the user"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The new password for the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "404": {
+            "description": "Email already exist"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/signin": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Sign in the user",
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email for the user"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The password for the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "user's cookie"
+              }
+            }
+          },
+          "401": {
+            "description": "Incorrect email or password"
+          },
+          "404": {
+            "description": "Email already exist"
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/oauth2/google": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Sign in the user with google",
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email for the user"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "The password for the user"
+                  },
+                  "googleId": {
+                    "type": "string",
+                    "description": "The googleId for the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "user's cookie"
+              }
+            }
+          },
+          "422": {
+            "description": "Request body validation error"
+          }
+        }
+      }
+    },
+    "/user/signout": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Sign out the user",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "success",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "set user's cookie to empty"
+              }
+            }
+          },
+          "400": {
+            "description": "Already loged out"
+          }
+        }
+      }
+    },
+    "/generateSummaryEmail": {
+      "post": {
+        "tags": [
+          "summaryEmail"
+        ],
+        "summary": "Send summary email",
+        "description": "Generate the weekly summary email and send to the specific email address",
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": true,
+            "description": "User's unique id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sendEmail",
+            "in": "query",
+            "required": true,
+            "description": "The target email address",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "This account is registerd in this week"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "The user ID."
+          },
+          "workTime": {
+            "type": "object",
+            "properties": {
+              "totalTimeSpent": {
+                "type": "number",
+                "description": "The total time user spent on working"
+              },
+              "intervals": {
+                "type": "array",
+                "items": {
+                  "properties": {
+                    "startTime": {
+                      "type": "string",
+                      "description": "The start time of this interval"
+                    },
+                    "stopTime": {
+                      "type": "string",
+                      "description": "The stop time of this interval"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "playTime": {
+            "type": "object",
+            "properties": {
+              "totalTimeSpent": {
+                "type": "number",
+                "description": "The total time user spent on playing"
+              },
+              "intervals": {
+                "type": "array",
+                "items": {
+                  "properties": {
+                    "startTime": {
+                      "type": "string",
+                      "description": "The start time of this interval"
+                    },
+                    "stopTime": {
+                      "type": "string",
+                      "description": "The stop time of this interval"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "offlineTime": {
+            "type": "object",
+            "properties": {
+              "totalTimeSpent": {
+                "type": "number",
+                "description": "The total time user is offline"
+              },
+              "intervals": {
+                "type": "array",
+                "items": {
+                  "properties": {
+                    "startTime": {
+                      "type": "string",
+                      "description": "The start time of this interval"
+                    },
+                    "stopTime": {
+                      "type": "string",
+                      "description": "The stop time of this interval"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "unallocatedTime": {
+            "type": "object",
+            "properties": {
+              "totalTimeSpent": {
+                "type": "number",
+                "description": "The total time user spent on nothing"
+              },
+              "intervals": {
+                "type": "array",
+                "items": {
+                  "properties": {
+                    "startTime": {
+                      "type": "string",
+                      "description": "The start time of this interval"
+                    },
+                    "stopTime": {
+                      "type": "string",
+                      "description": "The stop time of this interval"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "duty": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The thing that friend is currently working on."
+              },
+              "startTime": {
+                "type": "string",
+                "description": "The start time."
+              }
+            }
+          }
+        }
+      },
+      "friendList": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "The user ID."
+          },
+          "email": {
+            "type": "string",
+            "description": "The user's email."
+          },
+          "friendList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sendedRequests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "receivedRequests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "example": "theUser"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "12345"
+          },
+          "googleId": {
+            "type": "string"
+          },
+          "access_token": {
+            "type": "string"
+          },
+          "authentication_type": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "slackerScore": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}
