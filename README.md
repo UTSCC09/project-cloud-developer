@@ -4,7 +4,7 @@
 
 > The team members for this web project are Jiayu Lu, Dezhi Ren, and Andrew D’Amario.
 
-### Project Description
+## Project Description
 
 Demo link: https://youtu.be/qPEEWPazE-k
 
@@ -44,6 +44,9 @@ If at the end of the week you have spent an acceptable amount of time doing each
 * Automatic light/dark mode matching system theme.
 * Seeing friends 3D weekly bar graph of their time allocation summary.
 * Offline time is calculated when the app is not open i.e. not on your computer, and unallocated time when you are running any timer.
+* Created docker container for backend and frontend.
+
+**NOTE:** There are newer features and improvements which we have implemented that are listed here, but we were not able to deploy them given time constraints. Please demo the app on localhost to see them.
 
 ### Technology Stack
 
@@ -55,7 +58,7 @@ If at the end of the week you have spent an acceptable amount of time doing each
 
 ### Deployment
 
-AWS with Ubuntu VM and Docker
+AWS with Ubuntu VM and Docker at [www.slackerstracker.com](http://www.slackerstracker.com).
 
 ## Development
 
@@ -81,3 +84,16 @@ npm start
 ```
 
 Now our app is accessible at http://localhost:3000.
+
+## Docs
+
+Visit api docs at http://localhost:3000/api-docs.
+
+## Screenshots
+
+Display friends' running timers and statistics.
+![](slacker-tracker/media/Screenshot%20from%202022-08-03%2023-11-19.png)
+
+Automatic light/dark mode.
+![](slacker-tracker/media/Screenshot%20from%202022-08-03%2023-09-00.png)
+![](slacker-tracker/media/Screenshot%20from%202022-08-03%2023-08-37.png)
