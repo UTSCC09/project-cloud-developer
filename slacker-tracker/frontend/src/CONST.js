@@ -3,7 +3,7 @@ const CONST = {
   colors: {
     green: '#38d86c'
   },
-  backendURL: 'http://www.slackertracker.software:3001',
+  backendURL: 'http://localhost:3001',
   milsecPerMin: 1000 * 60
 }
 
