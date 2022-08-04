@@ -1,4 +1,4 @@
-# CSCC09 Web Project Beta version
+# CSCC09 Web Project Final version
 
 ### Team Members
 
