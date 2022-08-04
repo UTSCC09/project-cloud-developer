@@ -5,6 +5,8 @@ import PropTypes from 'prop-types'
 import Bar from './bar'
 import CONST from '../../CONST.js'
 import './bubble.css'
+import Cookies from 'js-cookie'
+import axios from 'axios'
 
 Bubble.propTypes = {
   onlineUsersId: PropTypes.array,
@@ -21,6 +23,30 @@ export default function Bubble (props) {
   // const [onlineUsersIdBubble, setonlineUsersIdBubble] = useState(props.onlineUsersId)
   const [me, setMe] = useState(props.me)
   const [users, setUsers] = useState(props.users)
+  const _id = Cookies.get('_id')
+
+  useEffect(() => {
+    axios({
+      method: 'GET',
+      url: `${CONST.backendURL}/api/timer/self?_id=${_id}`,
+      withCredentials: true
+    }).then((res) => {
+      console.log(res)
+      setMe(res.data.data)
+    }).catch((err) => {
+      console.log(err)
+    })
+    axios({
+      method: 'GET',
+      url: `${CONST.backendURL}/api/timer/friends?_id=${_id}`,
+      withCredentials: true
+    }).then((res) => {
+      console.log(res)
+      setUsers(res.data.data)
+    }).catch((err) => {
+      console.log(err)
+    })
+  }, [])
 
   useEffect(() => {
     // setonlineUsersIdBubble(props.onlineUsersId)
