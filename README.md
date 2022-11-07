@@ -1,8 +1,6 @@
 # slacker-tracker
 
-### Team Members
-
-> The team members for this web project are Jiayu Lu, Dezhi Ren, and Andrew D’Amario.
+> by Jiayu Lu, Dezhi Ren, and Andrew D’Amario © CSCC09 Project ~ Summer 2022
 
 ## Project Description
 
