@@ -1,4 +1,4 @@
-# CSCC09 Web Project Final version
+# slacker-tracker
 
 ### Team Members
 
@@ -7,8 +7,6 @@
 ## Project Description
 
 Demo link: https://youtu.be/qPEEWPazE-k
-
-### *slacker-tracker*
 
 *It will never leave you lacking... if you be slacking, it be tracking... so get hacking!*
 
